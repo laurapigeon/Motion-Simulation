@@ -1,0 +1,17 @@
+Tab through menu sections
+Make label vector function good
+Offscreen Delete
+Camera Focus
+Load states (p motion, 0 g, etc)
+Show acceleration vectors
+Path tracing
+Grid
+Show vector field
+Screen wrap
+Mouse mass and charge
+Walls
+Collisions
+Show orbit vector in initiate
+
+Fullscreen**
+Projectile count
