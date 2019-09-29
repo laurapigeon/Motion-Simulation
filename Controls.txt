@@ -1,0 +1,22 @@
+Projectile Simulation Controls
+------------------------------
+
+Click - Create projectile (if none being made) / Release projectile (if being made)
+Shift click - Create projectile (if being made)
+Right click - Create fixed point
+
+Up / Down arrows - Tab through values sliders
+Scroll - Edit selected value
+Shift scroll - Edit /10 (per scroll bump)
+Ctrl scroll - Edit x10 (per scroll bump)
+
+Backspace - Deletes last projectile
+Shift delete - Remove all projectiles
+Ctrl delete - Reset canvas and values (and projectiles)
+
+Period - Frame advance
+Comma - Frame retreat
+P - Pause
+
+s[NUM] - Save state
+l[NUM] - Load state
