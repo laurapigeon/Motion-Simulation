@@ -188,14 +188,14 @@ never-returning-functions=sys.exit
 [BASIC]
 
 # Naming style matching correct argument names.
-argument-naming-style=snake_case
+argument-naming-style=
 
 # Regular expression matching correct argument names. Overrides argument-
 # naming-style.
 #argument-rgx=
 
 # Naming style matching correct attribute names.
-attr-naming-style=snake_case
+attr-naming-style=
 
 # Regular expression matching correct attribute names. Overrides attr-naming-
 # style.
@@ -217,7 +217,7 @@ class-attribute-naming-style=any
 #class-attribute-rgx=
 
 # Naming style matching correct class names.
-class-naming-style=PascalCase
+class-naming-style=
 
 # Regular expression matching correct class names. Overrides class-naming-
 # style.
@@ -235,7 +235,7 @@ const-naming-style=UPPER_CASE
 docstring-min-length=-1
 
 # Naming style matching correct function names.
-function-naming-style=snake_case
+function-naming-style=
 
 # Regular expression matching correct function names. Overrides function-
 # naming-style.
