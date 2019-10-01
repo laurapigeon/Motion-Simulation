@@ -243,7 +243,6 @@ class visual:
     def value():
         for i, name in enumerate(values):
             value = values[name]
-            #if value[9] == val_menu:
             marker = ("", ">> ")[val_mode == i]
             num_value = str(round(value[1], value[8]))
             unit = value[7]
@@ -262,6 +261,10 @@ class visual:
     @staticmethod
     def time():
         visual.draw_text("t = {}{}".format(round(t, 2), "s"), (0, 0), "topleft")
+
+    @staticmethod
+    def projectile_count():
+        visual.draw_text("{} projectiles".format(len(projectiles)+len(i_projectiles)), (0, 20), "topleft")
 
     @staticmethod
     def mouse_pos():
@@ -337,18 +340,12 @@ while not done:
 
             if event.unicode in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
                 if cing:
-                    saves[int(event.unicode)] = copy.deepcopy((projectiles,
-                                                               i_projectiles,
-                                                               values,
-                                                               t,
-                                                               playing))
+                    save = copy.deepcopy((projectiles, i_projectiles, values, t, playing))
+                    saves[int(event.unicode)] = save
                 elif ving:
                     if saves[int(event.unicode)]:
-                        projectiles,
-                        i_projectiles,
-                        values,
-                        t,
-                        playing = copy.deepcopy(saves)[int(event.unicode)]
+                        save = copy.deepcopy(saves)[int(event.unicode)]
+                        projectiles, i_projectiles, values, t, playing = save
 
             if event.key == pygame.K_LSHIFT:
                 shifting = True
@@ -389,8 +386,11 @@ while not done:
                     val_mode = 0
                     t = 0
 
-            elif projectiles and event.key == pygame.K_BACKSPACE:
-                del projectiles[-1]
+            elif event.key == pygame.K_BACKSPACE:
+                if i_projectiles:
+                    del i_projectiles[-1]
+                elif projectiles:
+                    del projectiles[-1]
 
             if event.key == pygame.K_LEFT:
                 multiplier = [64, 1]
@@ -510,6 +510,7 @@ while not done:
     visual.value()
     visual.resolution()
     visual.time()
+    visual.projectile_count()
 
     if not playing:
         visual.pause()
