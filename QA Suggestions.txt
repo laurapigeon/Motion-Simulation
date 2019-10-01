@@ -1,5 +1,4 @@
 Tab through menu sections
-Make label vector function good
 Offscreen Delete
 Camera Focus
 Load states (p motion, 0 g, etc)
@@ -13,6 +12,6 @@ Walls
 Collisions
 Show orbit vector in initiate
 
-Fullscreen**
-Projectile count
+Fullscreen
+Boids
 Rewrite force pairing (exclude double fixed)

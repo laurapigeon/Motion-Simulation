@@ -34,7 +34,7 @@ class Projectile:
         F_x2s, F_y2s = mechanical.resolve(F_s, θ_s)
         self.F_xs, self.F_ys = mechanical.sum_vector(self.F_xs, self.F_ys, F_x2s, F_y2s)
 
-    def update(self, Δt):
+    def update(self, dt):
         if values["life"][1] and abs(t - self.t_0 > values["life"][1]):
             projectiles.remove(self)
 
@@ -43,11 +43,11 @@ class Projectile:
             projectiles.remove(self)
 
         if not self.fixed:
-            dP_xs, dP_ys = mechanical.dot_product(self.v_xs, self.v_ys, Δt)
-            Δv_xs, Δv_ys = mechanical.dot_product(self.F_xs, self.F_ys, Δt/self.m)
+            dP_xs, dP_ys = mechanical.dot_product(self.v_xs, self.v_ys, dt)
+            dv_xs, dv_ys = mechanical.dot_product(self.F_xs, self.F_ys, dt/self.m)
 
             self.P_xs, self.P_ys = mechanical.sum_vector(self.P_xs, self.P_ys, dP_xs, dP_ys)
-            self.v_xs, self.v_ys = mechanical.sum_vector(self.v_xs, self.v_ys, Δv_xs, Δv_ys)
+            self.v_xs, self.v_ys = mechanical.sum_vector(self.v_xs, self.v_ys, dv_xs, dv_ys)
 
     def get_pos(self):
         return mechanical.to_pixel(self.P_xs, self.P_ys, True)
@@ -66,11 +66,14 @@ class Projectile:
         if self.fixed:
             pygame.draw.circle(screen, self.dark_colour, (P_xp, P_yp), round(r_p / 2))
 
-    def draw_vector(self, Δt=1, P_x2p=None, P_y2p=None):
-        if not self.fixed:
+    def draw_vector(self, dt=1, mouse=False):
             P_x1p, P_y1p = self.get_pos()
-            if P_x2p == None or P_y2p == None:
-                dP_xs, dP_ys = mechanical.dot_product(self.v_xs, self.v_ys, Δt)
+
+            if mouse:
+                P_x2p, P_y2p = mouse_pixel
+
+            else:
+                dP_xs, dP_ys = mechanical.dot_product(self.v_xs, self.v_ys, dt)
                 dP_xp, dP_yp = mechanical.to_pixel(dP_xs, dP_ys)
                 P_x2p, P_y2p = mechanical.sum_vector(P_x1p, P_y1p, dP_xp, dP_yp)
 
@@ -97,26 +100,24 @@ class Projectile:
             visual.draw_text("{}C".format(self.Q),
                              (P_xp, P_yp+offset), "midtop", (self.light_colour))
 
-    def label_vector(self, P_x2p=None, P_y2p=None):
-        if not self.fixed:
-            P_x1p, P_y1p = self.get_pos()
-            if P_x2p == None or P_y2p == None:
-                v_xp, v_yp = mechanical.to_pixel(self.v_xs, self.v_ys)
-                P_x2p, P_y2p = mechanical.sum_vector(P_x1p, P_y1p, v_xp, v_yp)
-                v_s, θ_s = mechanical.combine(self.v_xs, self.v_ys)
-            else:
-                v_xp, v_yp = mechanical.sub_vector(P_x1p, P_y1p, P_x2p, P_y2p)
-                v_xs, v_ys = mechanical.to_scale(v_xp, v_yp)
-                v_s, θ_s = mechanical.combine(v_xs, v_ys)
+    def label_vector(self, mouse=False):
+        P_x1p, P_y1p = self.get_pos()
 
-            P_xmp, P_ymp = mechanical.dot_product(*mechanical.sum_vector(P_x1p, P_y1p,
-                                                                         P_x2p, P_y2p),
-                                                  1/2)
+        if mouse:
+            v_xp, v_yp = mechanical.sub_vector(P_x1p, P_y1p, P_x2p, P_y2p)
+            v_xs, v_ys = mechanical.to_scale(v_xp, v_yp)
+            v_s, θ_s = mechanical.combine(v_xs, v_ys)
 
-            visual.draw_text(str(round(v_s, 2)) + "ms-1",
-                             (P_xmp, P_ymp), "center", self.light_colour)
+        else:
+            v_xp, v_yp = mechanical.to_pixel(self.v_xs, self.v_ys)
+            P_x2p, P_y2p = mechanical.sum_vector(P_x1p, P_y1p, v_xp, v_yp)
+            v_s, θ_s = mechanical.combine(self.v_xs, self.v_ys)
 
-            visual.draw_text(str(round(math.degrees(θ_s), 2)) + "°",
+        P_xmp, P_ymp = mechanical.midpoint(P_x1p, P_y1p, P_x2p, P_y2p)
+
+        visual.draw_text(str(round(v_s, 2)) + "ms-1",
+                         (P_xmp, P_ymp), "center", self.light_colour)
+        visual.draw_text(str(round(math.degrees(θ_s), 2)) + "°",
                              (P_x1p, P_y1p), "topleft", self.light_colour)
 
 
@@ -147,9 +148,14 @@ class mechanical:
         return x*k, y*k
 
     @staticmethod
+    def midpoint(x_1, y_1, x_2, y_2):
+        s_x, s_y = mechanical.sum_vector(P_x1p, P_y1p, P_x2p, P_y2p)
+        return mechanical.dot_product(s_x, s_y, 1/2)
+
+    @staticmethod
     def force(k, s_1, x_1, y_1, s_2, x_2, y_2):
-        Δx, Δy = mechanical.sub_vector(x_1, y_1, x_2, y_2)
-        r, θ = mechanical.combine(Δx, Δy)
+        dx, dy = mechanical.sub_vector(x_1, y_1, x_2, y_2)
+        r, θ = mechanical.combine(dx, dy)
 
         try:
             return k*s_1*s_2 / r**2, θ
@@ -240,7 +246,7 @@ class visual:
         screen.blit(text_surface, text_rectangle)
 
     @staticmethod
-    def value():
+    def values():
         for i, name in enumerate(values):
             value = values[name]
             marker = ("", ">> ")[val_mode == i]
@@ -280,6 +286,51 @@ class visual:
                              (10*(i+1), screen_pixel[1] - 30),
                              (10*(i+1), screen_pixel[1] - 10), 5)
 
+    @staticmethod
+    def to_canvas():
+        screen.fill((0, 0, 0))
+
+        for i_projectile in i_projectiles:
+            if not i_projectile.fixed:
+
+                i_projectile.draw_vector(dt=1, mouse=True)
+
+                if values["vis_vectors"][1] >= 2:
+                    i_projectile.label_vector(mouse=True)
+
+            i_projectile.draw_mass()
+
+            if values["vis_values"][1] >= 1:
+                i_projectile.label_values(values["vis_values"][1])
+
+
+        for projectile in projectiles:
+
+            if not projectile.fixed:
+
+                if values["vis_vectors"][1] >= 1:
+                    projectile.draw_vector(1)
+
+                if values["vis_vectors"][1] >= 2:
+                    projectile.label_vector()
+
+            projectile.draw_mass()
+
+            if values["vis_values"][1] >= 1:
+                projectile.label_values(values["vis_values"][1])
+
+        if values["vis_values"][1] >= 1:
+            visual.mouse_pos()
+
+
+        visual.values()
+        visual.resolution()
+        visual.time()
+        visual.projectile_count()
+
+        if not playing:
+            visual.pause()
+
 
 done = False
 playing = True
@@ -290,20 +341,21 @@ ctrling = False
 show_vectors = False
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
-values = {"space":   ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
-          "screenx": ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-          "screeny": ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-          "time":    ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
-          "gravity": ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
-          "angle":   ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
-          "G":       ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
-          "k_e":     ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
-          "charge":  ["Charge",       0,   "lin", 0.01,  0.1,  1,   [None, None], "C",        2, 2],
-          "mass":    ["Mass",         1,   "lin", 0.01,  0.1,  1,   [0.1, None],  "kg",       2, 2],
-          "radius":  ["Radius",       0.1, "geo", 0.005, 0.05, 0.5, [None, None], "m",        2, 2],
-          "life":    ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
-          "vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
-          "values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
+values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
+          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
+          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
+          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
+          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
+          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
+          "charge":      ["Charge",       0,   "lin", 0.01,  0.1,  1,   [None, None], "C",        2, 2],
+          "mass":        ["Mass",         1,   "lin", 0.01,  0.1,  1,   [0.1, None],  "kg",       2, 2],
+          "radius":      ["Radius",       0.1, "geo", 0.005, 0.05, 0.5, [None, None], "m",        2, 2],
+          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
+          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
+          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
+
 val_order = [a for a in values]
 val_mode = 0
 val_menu = 0
@@ -422,12 +474,12 @@ while not done:
                     if event.button == 1:
                         i_projectiles.append(Projectile(*mouse_scale,
                                                         *projectile_values,
-                                                        False))
+                                                        fixed=False))
 
                     elif event.button == 3:
                         fixed_projectile = Projectile(*mouse_scale,
                                                       *projectile_values,
-                                                      True)
+                                                      fixed=True)
 
                         fixed_projectile.initiate(1, *mouse_scale)
                         projectiles.append(fixed_projectile)
@@ -437,12 +489,12 @@ while not done:
                         if event.button == 1:
                             i_projectiles.append(Projectile(*mouse_scale,
                                                             *projectile_values,
-                                                            False))
+                                                            fixed=False))
 
                         elif event.button == 3:
                             fixed_projectile = Projectile(*mouse_scale,
                                                           *projectile_values,
-                                                          True)
+                                                          fixed=True)
 
                             fixed_projectile.initiate(1, *mouse_scale)
                             projectiles.append(fixed_projectile)
@@ -474,46 +526,15 @@ while not done:
             screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
             screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
 
-    screen.fill((0, 0, 0))
-
-    for i_projectile in i_projectiles:
-        i_projectile.draw_vector(1, *mouse_pixel)
-        i_projectile.draw_mass()
-        if values["vectors"][1] >= 2:
-            i_projectile.label_vector(*mouse_pixel)
-
-        if values["values"][1] >= 1:
-            i_projectile.label_values(values["values"][1])
-
-    for x, projectile in enumerate(projectiles):
-        projectile.earth()
 
     if playing:
         mechanical.tick(values["time"][1] / tick)
         t += values["time"][1] / tick
+    
+    for x, projectile in enumerate(projectiles):
+        projectile.earth()
 
-    for projectile in projectiles:
-        if values["vectors"][1] >= 1:
-            projectile.draw_vector(1)
-
-        projectile.draw_mass()
-
-        if values["vectors"][1] >= 2:
-            projectile.label_vector()
-
-        if values["values"][1] >= 1:
-            projectile.label_values(values["values"][1])
-
-    if values["values"][1] >= 1:
-        visual.mouse_pos()
-
-    visual.value()
-    visual.resolution()
-    visual.time()
-    visual.projectile_count()
-
-    if not playing:
-        visual.pause()
+    visual.to_canvas()
 
     clock.tick(tick)
     pygame.display.flip()
