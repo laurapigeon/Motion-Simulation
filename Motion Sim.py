@@ -17,9 +17,9 @@ class Projectile:
         self.m = mass
         self.r_s = radius
         self.fixed = fixed
-        self.light_colour = self.get_colour(0.75) # pylint: disable=C0326
-        self.colour       = self.get_colour(0.5)  # pylint: disable=C0326
-        self.dark_colour  = self.get_colour(0.25) # pylint: disable=C0326
+        self.light_colour = self.get_colour(0.75)
+        self.colour       = self.get_colour(0.5)
+        self.dark_colour  = self.get_colour(0.25)
 
     def initiate(self, dt, P_x2s, P_y2s):
         self.t_0 = t
@@ -287,20 +287,20 @@ ctrling = False
 show_vectors = False
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
-values = {"space":   ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0], # pylint: disable=C0326
-          "screenx": ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0], # pylint: disable=C0326
-          "screeny": ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0], # pylint: disable=C0326
-          "time":    ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1], # pylint: disable=C0326
-          "gravity": ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1], # pylint: disable=C0326
-          "angle":   ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1], # pylint: disable=C0326
-          "G":       ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1], # pylint: disable=C0326
-          "k_e":     ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1], # pylint: disable=C0326
-          "charge":  ["Charge",       0,   "lin", 0.01,  0.1,  1,   [None, None], "C",        2, 2], # pylint: disable=C0326
-          "mass":    ["Mass",         1,   "lin", 0.01,  0.1,  1,   [0.1, None],  "kg",       2, 2], # pylint: disable=C0326
-          "radius":  ["Radius",       0.1, "geo", 0.005, 0.05, 0.5, [None, None], "m",        2, 2], # pylint: disable=C0326
-          "life":    ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2], # pylint: disable=C0326
-          "vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3], # pylint: disable=C0326
-          "values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]} # pylint: disable=C0326
+values = {"space":   ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
+          "screenx": ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+          "screeny": ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+          "time":    ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
+          "gravity": ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
+          "angle":   ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
+          "G":       ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
+          "k_e":     ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
+          "charge":  ["Charge",       0,   "lin", 0.01,  0.1,  1,   [None, None], "C",        2, 2],
+          "mass":    ["Mass",         1,   "lin", 0.01,  0.1,  1,   [0.1, None],  "kg",       2, 2],
+          "radius":  ["Radius",       0.1, "geo", 0.005, 0.05, 0.5, [None, None], "m",        2, 2],
+          "life":    ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
+          "vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
+          "values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
 val_order = [a for a in values]
 val_mode = 0
 val_menu = 0
@@ -311,8 +311,8 @@ g = -9.80665
 
 screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
 
-i_projectiles = list() # pylint: disable=C0326
-projectiles   = list() # pylint: disable=C0326
+i_projectiles = list()
+projectiles   = list()
 
 while not done:
 
@@ -351,10 +351,10 @@ while not done:
                         playing = copy.deepcopy(saves)[int(event.unicode)]
 
             if event.key == pygame.K_LSHIFT:
-                shifting = True # pylint: disable=C0326
+                shifting = True
 
             if event.key == pygame.K_LCTRL:
-                ctrling  = True # pylint: disable=C0326
+                ctrling  = True
 
             if event.key == pygame.K_DOWN:
                 val_mode = mechanical.bump(val_mode, 1, "mod", "inc", [0, len(values) - 1])
@@ -405,10 +405,10 @@ while not done:
                 ving = False
 
             if event.key == pygame.K_LSHIFT:
-                shifting = False # pylint: disable=C0326
+                shifting = False
 
             if event.key == pygame.K_LCTRL:
-                ctrling  = False # pylint: disable=C0326
+                ctrling  = False
 
 
         if event.type == pygame.MOUSEBUTTONDOWN:
