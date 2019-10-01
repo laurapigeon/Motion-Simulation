@@ -6,13 +6,18 @@ Shift click - Create projectile (if being made)
 Right click - Create fixed point
 
 Up / Down arrows - Tab through values sliders
-Scroll - Edit selected value
 Shift scroll - Edit /10 (per scroll bump)
+Scroll - Edit selected value
 Ctrl scroll - Edit x10 (per scroll bump)
 
 Backspace - Deletes last projectile
-Shift delete - Remove all projectiles
-Ctrl delete - Reset canvas and values (and projectiles)
+Shift delete - Removes offscreen projectiles
+Delete - Removes dynamic projectiles
+Ctrl delete - Remove all projectiles
+
+Shift Escape - Reset last value
+Escape - Reset canvas and values
+Ctrl escape - Quit
 
 Period - Frame advance
 Comma - Frame retreat
