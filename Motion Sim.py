@@ -165,7 +165,7 @@ class mechanical:
 
     @staticmethod
     def midpoint(x_1, y_1, x_2, y_2):
-        s_x, s_y = mechanical.sum_vector(P_x1p, P_y1p, P_x2p, P_y2p)
+        s_x, s_y = mechanical.sum_vector(x_1, y_1, x_2, y_2)
         return mechanical.dot_product(s_x, s_y, 1/2)
 
     @staticmethod
@@ -462,6 +462,7 @@ while not done:
                             projectiles.remove(projectile)
 
                 elif ctrling:
+                    i_projectiles = []
                     projectiles = []
                     t = 0
 
@@ -473,7 +474,7 @@ while not done:
             elif event.key == pygame.K_BACKSPACE:
                 if shifting:
                     if projectiles:
-                        del projetiles[0]
+                        del projectiles[0]
                     elif i_projectiles:
                         del i_projectiles[0]
 

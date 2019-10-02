@@ -1,6 +1,12 @@
 Tab through menu sections
 Camera Focus
 Load states (p motion, 0 g, etc)
+ > projectile motion
+ > star orbits
+ > unaffected points (equal gravity and charge)
+ > field pool
+ > atom walls
+ > boids example
 Show acceleration vectors
 Path tracing
 Grid
