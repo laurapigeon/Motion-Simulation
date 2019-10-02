@@ -38,16 +38,15 @@ class Projectile:
         if self.get_dead():
             projectiles.remove(self)
 
-        v_xp, v_yp = mechanical.to_pixel(self.v_xs, self.v_ys)
-        if v_xp > sys.maxsize / 1000 or v_yp > sys.maxsize / 1000:
-            projectiles.remove(self)
-
         if not self.fixed:
             dP_xs, dP_ys = mechanical.dot_product(self.v_xs, self.v_ys, dt)
             dv_xs, dv_ys = mechanical.dot_product(self.F_xs, self.F_ys, dt/self.m)
 
             self.P_xs, self.P_ys = mechanical.sum_vector(self.P_xs, self.P_ys, dP_xs, dP_ys)
             self.v_xs, self.v_ys = mechanical.sum_vector(self.v_xs, self.v_ys, dv_xs, dv_ys)
+
+            if self.get_too_far():
+                projectiles.remove(self)
 
     def get_pos(self):
         return mechanical.to_pixel(self.P_xs, self.P_ys, True)
@@ -62,6 +61,11 @@ class Projectile:
         horizontal = 0 < P_xp and P_xp < screen_pixel[0]
         vertical   = 0 < P_yp and P_yp < screen_pixel[1]
         return horizontal and vertical
+    
+    def get_too_far(self):
+        P_xp, P_yp = self.get_pos()
+        max_P = sys.maxsize/100
+        return P_xp < -max_P or max_P < P_xp or P_yp < -max_P or max_P < P_yp
 
     def get_colour(self, L):
         colour = colorsys.hsv_to_rgb(mechanical.sigmoid(-self.Q/3),
@@ -76,6 +80,7 @@ class Projectile:
         pygame.draw.circle(screen, self.colour, (P_xp, P_yp), r_p)
         if self.fixed:
             pygame.draw.circle(screen, self.dark_colour, (P_xp, P_yp), round(r_p / 2))
+            
 
     def draw_vector(self, dt=1, mouse=False):
             P_x1p, P_y1p = self.get_pos()
@@ -164,14 +169,8 @@ class mechanical:
         return mechanical.dot_product(s_x, s_y, 1/2)
 
     @staticmethod
-    def force(k, s_1, x_1, y_1, s_2, x_2, y_2):
-        dx, dy = mechanical.sub_vector(x_1, y_1, x_2, y_2)
-        r, θ = mechanical.combine(dx, dy)
-
-        try:
-            return k*s_1*s_2 / r**2, θ
-        except:
-            return 0.1, 0
+    def law_force(k, r, s_1, s_2):
+        return k*s_1*s_2 / r**2
 
     @staticmethod
     def to_scale(x, y, P=False):
@@ -230,20 +229,29 @@ class mechanical:
         return 1 / (1 + math.exp(-x))
 
     def tick(tick):
-        for x, projectile in enumerate(projectiles[::-1]):
-            for prokectile in projectiles[(x + 1):]:
-                F, θ = mechanical.force(values["G"][1],
-                                        projectile.m, projectile.P_xs, projectile.P_ys,
-                                        prokectile.m, prokectile.P_xs, prokectile.P_ys)
-                projectile.apply_force(F, θ)
-                prokectile.apply_force(-F, θ)
+        for x, projectile in enumerate(projectiles):
+            if not projectile.fixed:
+                for prokectile in projectiles:
+                    if projectile != prokectile:
 
-                F, θ = mechanical.force(values["k_e"][1],
-                                        projectile.Q, projectile.P_xs, projectile.P_ys,
-                                        prokectile.Q, prokectile.P_xs, prokectile.P_ys)
-                projectile.apply_force(-F, θ)
-                prokectile.apply_force(F, θ)
+                        dx, dy = mechanical.sub_vector(projectile.P_xs, projectile.P_ys, 
+                                                    prokectile.P_xs, prokectile.P_ys)
+                        r, θ = mechanical.combine(dx, dy)
 
+                        if r == 0:
+                            r = 0.001
+
+                        if values["G"][1]:
+                            F = mechanical.law_force(values["G"][1], r,
+                                                    projectile.m, prokectile.m)
+                            projectile.apply_force(F, θ)
+
+                        if values["k_e"][1]:
+                            F = mechanical.law_force(values["k_e"][1], r,
+                                                    projectile.Q, prokectile.Q)
+                            projectile.apply_force(-F, θ)
+
+        for projectile in projectiles[::-1]:
             projectile.update(tick)
 
 
@@ -416,6 +424,7 @@ while not done:
                 if cing:
                     save = copy.deepcopy((projectiles, i_projectiles, values, t, playing))
                     saves[int(event.unicode)] = save
+
                 elif ving:
                     if saves[int(event.unicode)]:
                         save = copy.deepcopy(saves)[int(event.unicode)]
@@ -442,7 +451,6 @@ while not done:
             if event.key == pygame.K_PERIOD:
                 t += 1 / tick
                 mechanical.tick(1 / tick)
-
             elif event.key == pygame.K_COMMA:
                 t -= 1 / tick
                 mechanical.tick(-1 / tick)
@@ -452,9 +460,11 @@ while not done:
                     for projectile in projectiles[::-1]:
                         if not projectile.get_visible():
                             projectiles.remove(projectile)
+
                 elif ctrling:
                     projectiles = []
                     t = 0
+
                 else:
                     for projectile in projectiles[::-1]:
                         if not projectile.fixed:
@@ -466,6 +476,7 @@ while not done:
                         del projetiles[0]
                     elif i_projectiles:
                         del i_projectiles[0]
+
                 else:
                     if i_projectiles:
                         del i_projectiles[-1]
@@ -480,13 +491,10 @@ while not done:
 
             if event.key == pygame.K_c:
                 cing = False
-
             if event.key == pygame.K_v:
                 ving = False
-
             if event.key == pygame.K_LSHIFT:
                 shifting = False
-
             if event.key == pygame.K_LCTRL:
                 ctrling  = False
 
@@ -503,7 +511,6 @@ while not done:
                         i_projectiles.append(Projectile(*mouse_scale,
                                                         *projectile_values,
                                                         fixed=False))
-
                     elif event.button == 3:
                         fixed_projectile = Projectile(*mouse_scale,
                                                       *projectile_values,
@@ -518,7 +525,6 @@ while not done:
                             i_projectiles.append(Projectile(*mouse_scale,
                                                             *projectile_values,
                                                             fixed=False))
-
                         elif event.button == 3:
                             fixed_projectile = Projectile(*mouse_scale,
                                                           *projectile_values,
@@ -537,12 +543,15 @@ while not done:
             if event.button in (4, 5):
                 value = values[val_name]
                 magnitude = 1
+
                 if shifting:
                     magnitude -= 1
                 if ctrling:
                     magnitude += 1
+
                 inc_type = ("inc", "dec")[event.button == 5]
                 amount = (value[3], value[4], value[5])[magnitude]
+
                 values[val_name][1] = mechanical.bump(value[1], amount, value[2], inc_type, value[6])
 
                 if val_mode == 0:
