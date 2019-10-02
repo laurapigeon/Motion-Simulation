@@ -33,7 +33,7 @@ Precise vector creation
 
 Added features:
 
-Object motion in uniform field
+Object motion in editable uniform field
 Object creation and velocity assignment by click
 Static object by right click
 Time and space scaling
