@@ -1,3 +1,5 @@
+Features to add:
+
 Tab through menu sections
 Camera Focus
 Load states (p motion, 0 g, etc)
@@ -22,4 +24,23 @@ Collisions
 Show orbit vector in initiate
 Fullscreen
 Boids
-Rewrite force pairing (exclude double fixed)
+ > separation
+ > alignment
+ > cohesion
+
+
+Added features:
+
+Object motion in uniform field
+Object creation and velocity assignment by click
+Static object by right click
+Time and space scaling
+Object law based radial fields
+Object creation property values
+Global values and constants
+Scroll and arrow key tabbing
+Various vector deletion methods
+Shift click for multiple projectiles
+Frame advance and pause
+Save states
+Space panning

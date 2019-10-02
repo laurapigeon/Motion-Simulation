@@ -225,9 +225,11 @@ class mechanical:
         else:
             return value
 
+    @staticmethod
     def sigmoid(x):
         return 1 / (1 + math.exp(-x))
 
+    @staticmethod
     def tick(tick):
         for x, projectile in enumerate(projectiles):
             if not projectile.fixed:
