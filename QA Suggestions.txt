@@ -17,4 +17,3 @@ Show orbit vector in initiate
 Fullscreen
 Boids
 Rewrite force pairing (exclude double fixed)
-Reset last value

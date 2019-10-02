@@ -230,7 +230,7 @@ class mechanical:
         return 1 / (1 + math.exp(-x))
 
     def tick(tick):
-        for x, projectile in enumerate(projectiles):
+        for x, projectile in enumerate(projectiles[::-1]):
             for prokectile in projectiles[(x + 1):]:
                 F, θ = mechanical.force(values["G"][1],
                                         projectile.m, projectile.P_xs, projectile.P_ys,
@@ -449,19 +449,28 @@ while not done:
 
             if event.key == pygame.K_DELETE:
                 if shifting:
-                    for projectile in projectiles:
+                    for projectile in projectiles[::-1]:
                         if not projectile.get_visible():
                             projectiles.remove(projectile)
-
-                if ctrling:
+                elif ctrling:
                     projectiles = []
                     t = 0
+                else:
+                    for projectile in projectiles[::-1]:
+                        if not projectile.fixed:
+                            projectiles.remove(projectile)
 
             elif event.key == pygame.K_BACKSPACE:
-                if i_projectiles:
-                    del i_projectiles[-1]
-                elif projectiles:
-                    del projectiles[-1]
+                if shifting:
+                    if projectiles:
+                        del projetiles[0]
+                    elif i_projectiles:
+                        del i_projectiles[0]
+                else:
+                    if i_projectiles:
+                        del i_projectiles[-1]
+                    elif projectiles:
+                        del projectiles[-1]
 
             if event.key == pygame.K_LEFT:
                 multiplier = [64, 1]
@@ -546,7 +555,7 @@ while not done:
             screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
 
 
-    for projectile in projectiles:
+    for projectile in projectiles[::-1]:
         projectile.earth()
 
     if playing:

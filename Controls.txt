@@ -10,7 +10,9 @@ Shift scroll - Edit /10 (per scroll bump)
 Scroll - Edit selected value
 Ctrl scroll - Edit x10 (per scroll bump)
 
+Shift backspace - Deletes first projectile
 Backspace - Deletes last projectile
+
 Shift delete - Removes offscreen projectiles
 Delete - Removes dynamic projectiles
 Ctrl delete - Remove all projectiles
