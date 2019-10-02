@@ -2,9 +2,12 @@ import os, sys, math, time, copy, pygame, random, colorsys
 
 pygame.init()
 pygame.font.init()
+
 pygame.display.set_caption("Us Simulation")
 screen_pixel = (1600, 900)
 screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
+fullscreen = False
+
 clock = pygame.time.Clock()
 tick = 120
 
@@ -421,6 +424,13 @@ while not done:
 
             if event.key == pygame.K_v:
                 ving = True
+
+            if event.key == pygame.K_f:
+                if fullscreen:
+                    screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
+                else:
+                    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                fullscreen = not fullscreen
 
             if event.unicode in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
                 if cing:

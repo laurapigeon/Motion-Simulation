@@ -27,6 +27,8 @@ Boids
  > separation
  > alignment
  > cohesion
+Modify existing body
+Precise vector creation
 
 
 Added features:
