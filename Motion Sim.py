@@ -353,6 +353,7 @@ ctrling = False
 show_vectors = False
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
+#            call            name        value        scaling [SML]        bounds        unit    dp menu
 values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
           "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
           "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
@@ -394,7 +395,12 @@ while not done:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
 
-                if ctrling:
+                if shifting:
+                    for i, name in enumerate(values):
+                        value = values[name]
+                        value[1] = (64, 0, 0, 1, 0, 270, 1, 1, 0, 1, 0.1, 0, 0, 0)[i]
+                    val_mode = 0
+                else:
                     done = True
 
             if event.key == pygame.K_p:
@@ -443,15 +449,12 @@ while not done:
 
             if event.key == pygame.K_DELETE:
                 if shifting:
-                    projectiles = []
+                    for projectile in projectiles:
+                        if not projectile.get_visible():
+                            projectiles.remove(projectile)
 
                 if ctrling:
                     projectiles = []
-                    playing = True
-                    for i, name in enumerate(values):
-                        value = values[name]
-                        value[1] = (64, 0, 0, 1, 0, 270, 1, 1, 0, 1, 0.1, 0, 0, 0)[i]
-                    val_mode = 0
                     t = 0
 
             elif event.key == pygame.K_BACKSPACE:

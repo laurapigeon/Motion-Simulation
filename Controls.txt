@@ -15,9 +15,8 @@ Shift delete - Removes offscreen projectiles
 Delete - Removes dynamic projectiles
 Ctrl delete - Remove all projectiles
 
-Shift Escape - Reset last value
-Escape - Reset canvas and values
-Ctrl escape - Quit
+Shift Escape - Reset canvas and values
+Escape - Quit
 
 Period - Frame advance
 Comma - Frame retreat

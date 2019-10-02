@@ -1,5 +1,4 @@
 Tab through menu sections
-Offscreen Delete
 Camera Focus
 Load states (p motion, 0 g, etc)
 Show acceleration vectors
@@ -10,8 +9,11 @@ Screen wrap
 Mouse mass and charge
 Walls
 Collisions
+ > coalescence
+ > ded
+ > smol ded
+ > elasticity
 Show orbit vector in initiate
-
 Fullscreen
 Boids
 Rewrite force pairing (exclude double fixed)
