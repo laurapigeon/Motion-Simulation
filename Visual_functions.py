@@ -1,8 +1,8 @@
 import os, sys, math, time, copy, pygame, random, colorsys
-import math_functions.py as mechanical
+import math_functions as mechanical
 
 def draw_text(text, coords, corner="topleft",
-                colour=(164, 164, 255), font=pygame.font.Font("freesansbold.ttf", 15)):
+              colour=(164, 164, 255), font=pygame.font.Font("freesansbold.ttf", 15)):
     text_surface = font.render(text, True, colour)
     text_rectangle = text_surface.get_rect()
     text_rectangle.__setattr__(corner, coords)

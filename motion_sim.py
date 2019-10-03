@@ -1,10 +1,11 @@
 import os, sys, math, time, copy, pygame, random, colorsys
-from .projectile_class.py import Projectile
-import math_functions.py as mechanical
-import visual_functions.py as visual
 
 pygame.init()
 pygame.font.init()
+
+from projectile_class import Projectile
+import math_functions as mechanical
+import visual_functions as visual
 
 pygame.display.set_caption("Us Simulation")
 screen_pixel = (1600, 900)
@@ -85,6 +86,10 @@ def to_canvas():
         visual.pause()
 
 
+def change_modifier():
+    
+
+
 done = False
 playing = True
 cing = False
@@ -103,9 +108,6 @@ values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, N
           "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
           "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
           "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
-          "charge":      ["Charge",       0,   "lin", 0.01,  0.1,  1,   [None, None], "C",        2, 2],
-          "mass":        ["Mass",         1,   "lin", 0.01,  0.1,  1,   [0.1, None],  "kg",       2, 2],
-          "radius":      ["Radius",       0.1, "geo", 0.005, 0.05, 0.5, [None, None], "m",        2, 2],
           "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
           "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
           "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
@@ -128,6 +130,7 @@ while not done:
     mouse_pixel = pygame.mouse.get_pos()
     mouse_scale = mechanical.to_scale(*mouse_pixel, True)
 
+    #pygame.key.get_pressed()
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:

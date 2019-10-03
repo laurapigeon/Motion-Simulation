@@ -20,26 +20,26 @@ def dot_product(x, y, k):
     return x*k, y*k
 
 def midpoint(x_1, y_1, x_2, y_2):
-    s_x, s_y = mechanical.sum_vector(x_1, y_1, x_2, y_2)
-    return mechanical.dot_product(s_x, s_y, 1/2)
+    s_x, s_y = sum_vector(x_1, y_1, x_2, y_2)
+    return dot_product(s_x, s_y, 1/2)
 
 def law_force(k, r, s_1, s_2):
     return k*s_1*s_2 / r**2
 
 def to_scale(x, y, P=False):
     if P:
-        x, y = mechanical.sub_vector(*mechanical.dot_product(*screen_pixel, 1/2), x, y)
-    x, y = mechanical.dot_product(x, -1*y, 1/values["space"][1])
+        x, y = sub_vector(*dot_product(*screen_pixel, 1/2), x, y)
+    x, y = dot_product(x, -1*y, 1/values["space"][1])
     if P:
-        x, y = mechanical.sub_vector(values["screenx"][1], values["screeny"][1], x, y)
+        x, y = sub_vector(values["screenx"][1], values["screeny"][1], x, y)
     return x, y
 
 def to_pixel(x, y, P=False):
     if P:
-        x, y = mechanical.sum_vector(values["screenx"][1], values["screeny"][1], x, y)
-    x, y = mechanical.dot_product(x, -1*y, values["space"][1])
+        x, y = sum_vector(values["screenx"][1], values["screeny"][1], x, y)
+    x, y = dot_product(x, -1*y, values["space"][1])
     if P:
-        x, y = mechanical.sum_vector(*mechanical.dot_product(*screen_pixel, 1/2), x, y)
+        x, y = mechanical.sum_vector(*dot_product(*screen_pixel, 1/2), x, y)
     return x, y
 
 def list_round(x, y, digits=0):

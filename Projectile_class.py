@@ -1,10 +1,13 @@
 import os, sys, math, time, copy, pygame, random, colorsys
-import math_functions.py as mechanical
-import visual_functions.py as visual
+import math_functions as mechanical
+import visual_functions as visual
 
 class Projectile:
-
-    def __init__(self, P_xs, P_ys, charge, mass, radius, fixed=False):
+    charge = 0
+    mass = 1
+    radius = 0.1
+    fixed = 0
+    def __init__(self, P_xs, P_ys):
         self.P_xs, self.P_ys = P_xs, P_ys
         self.Q = charge
         self.m = mass
