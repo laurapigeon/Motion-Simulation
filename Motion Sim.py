@@ -1,7 +1,7 @@
 import os, sys, math, time, copy, pygame, random, colorsys
-from projectile_class import Projectile
-import math_functions as mechanical
-import visual_functions as visual
+from .projectile_class.py import Projectile
+import math_functions.py as mechanical
+import visual_functions.py as visual
 
 pygame.init()
 pygame.font.init()

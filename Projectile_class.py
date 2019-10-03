@@ -1,6 +1,6 @@
 import os, sys, math, time, copy, pygame, random, colorsys
-import math_functions as mechanical
-import visual_functions as visual
+import math_functions.py as mechanical
+import visual_functions.py as visual
 
 class Projectile:
 
