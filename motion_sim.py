@@ -16,113 +16,7 @@ clock = pygame.time.Clock()
 tick = 120
 
 
-def tick(tick):
-    for x, projectile in enumerate(projectiles):
-        if not projectile.fixed:
-            for prokectile in projectiles:
-                if projectile != prokectile:
-
-                    dx, dy = mechanical.sub_vector(projectile.P_xs, projectile.P_ys, 
-                                                prokectile.P_xs, prokectile.P_ys)
-                    r, θ = mechanical.combine(dx, dy)
-
-                    if r == 0:
-                        r = 0.001
-
-                    if values["G"][1]:
-                        F = mechanical.law_force(values["G"][1], r,
-                                                projectile.m, prokectile.m)
-                        projectile.apply_force(F, θ)
-
-                    if values["k_e"][1]:
-                        F = mechanical.law_force(values["k_e"][1], r,
-                                                projectile.Q, prokectile.Q)
-                        projectile.apply_force(-F, θ)
-
-    for projectile in projectiles[::-1]:
-        projectile.update(tick)
-
-
-def to_canvas():
-    for i_projectile in i_projectiles:
-        if not i_projectile.fixed:
-
-            i_projectile.draw_vector(dt=1, mouse=True)
-
-            if values["vis_vectors"][1] >= 2:
-                i_projectile.label_vector(mouse=True)
-
-        i_projectile.draw_mass()
-
-        if values["vis_values"][1] >= 1:
-            i_projectile.label_values(values["vis_values"][1])
-
-
-    for projectile in projectiles:
-
-        if not projectile.fixed:
-
-            if values["vis_vectors"][1] >= 1:
-                projectile.draw_vector(1)
-
-            if values["vis_vectors"][1] >= 2:
-                projectile.label_vector()
-
-        projectile.draw_mass()
-
-        if values["vis_values"][1] >= 1:
-            projectile.label_values(values["vis_values"][1])
-
-    if values["vis_values"][1] >= 1:
-        visual.mouse_pos()
-
-
-    visual.values()
-    visual.resolution()
-    visual.time()
-    visual.projectile_count()
-
-    if not playing:
-        visual.pause()
-
-
-done = False
-playing = True
-cing = False
-ving = False
-shifting = False
-ctrling = False
-show_vectors = False
-saves = [(), (), (), (), (), (), (), (), (), ()]
-
-#            call            name        value        scaling [SML]        bounds        unit    dp menu
-#values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
-#          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-#          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-#          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
-#          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
-#          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
-#          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
-#          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
-#          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
-#          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
-#          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
-
-#val_order = [a for a in values]
-#val_mode = 0
-#val_menu = 0
-#val_name = "space"
-
-t = 0
-g = -9.80665
-
-screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
-
-i_projectiles = list()
-projectiles   = list()
-
-while not done:
-
+def check_inputs():
     mouse_pixel = pygame.mouse.get_pos()
     mouse_scale = mechanical.to_scale(*mouse_pixel, True)
 
@@ -304,11 +198,119 @@ while not done:
             screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
 
 
+def update_projectiles(tick):
     for projectile in projectiles[::-1]:
         projectile.earth()
 
+    for x, projectile in enumerate(projectiles):
+        if not projectile.fixed:
+            for prokectile in projectiles:
+                if projectile != prokectile:
+
+                    dx, dy = mechanical.sub_vector(projectile.P_xs, projectile.P_ys, 
+                                                prokectile.P_xs, prokectile.P_ys)
+                    r, θ = mechanical.combine(dx, dy)
+
+                    if r == 0:
+                        r = 0.001
+
+                    if values["G"][1]:
+                        F = mechanical.law_force(values["G"][1], r,
+                                                projectile.m, prokectile.m)
+                        projectile.apply_force(F, θ)
+
+                    if values["k_e"][1]:
+                        F = mechanical.law_force(values["k_e"][1], r,
+                                                projectile.Q, prokectile.Q)
+                        projectile.apply_force(-F, θ)
+
+    for projectile in projectiles[::-1]:
+        projectile.update(tick)
+
+
+def to_canvas():
+    for i_projectile in i_projectiles:
+        if not i_projectile.fixed:
+
+            i_projectile.draw_vector(dt=1, mouse=True)
+
+            if values["vis_vectors"][1] >= 2:
+                i_projectile.label_vector(mouse=True)
+
+        i_projectile.draw_mass()
+
+        if values["vis_values"][1] >= 1:
+            i_projectile.label_values(values["vis_values"][1])
+
+
+    for projectile in projectiles:
+
+        if not projectile.fixed:
+
+            if values["vis_vectors"][1] >= 1:
+                projectile.draw_vector(1)
+
+            if values["vis_vectors"][1] >= 2:
+                projectile.label_vector()
+
+        projectile.draw_mass()
+
+        if values["vis_values"][1] >= 1:
+            projectile.label_values(values["vis_values"][1])
+
+    if values["vis_values"][1] >= 1:
+        visual.mouse_pos()
+
+
+    visual.values()
+    visual.resolution()
+    visual.time()
+    visual.projectile_count()
+
+    if not playing:
+        visual.pause()
+
+
+done = False
+playing = True
+cing = False
+ving = False
+shifting = False
+ctrling = False
+show_vectors = False
+saves = [(), (), (), (), (), (), (), (), (), ()]
+
+#            call            name        value        scaling [SML]        bounds        unit    dp menu
+#values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
+#          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+#          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+#          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
+#          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
+#          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
+#          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
+#          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
+#          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
+#          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
+#          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
+
+#val_order = [a for a in values]
+#val_mode = 0
+#val_menu = 0
+#val_name = "space"
+
+t = 0
+g = -9.80665
+
+screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
+
+i_projectiles = list()
+projectiles   = list()
+
+while not done:
+    check_inputs()
+
     if playing:
-        tick(values["time"][1] / tick)
+        update_projectiles(values["time"][1] / tick)
         t += values["time"][1] / tick
 
     to_canvas()
