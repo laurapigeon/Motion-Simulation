@@ -51,28 +51,5 @@ def list_round(x, y, digits=0):
 def list_abs(x, y):
     return  abs(x), abs(y)
 
-def bump(value, amount, math_type, bump_type, bounds):
-    if math_type == "lin" and bump_type == "inc":
-        value += amount
-    elif math_type == "lin" and bump_type == "dec":
-        value -= amount
-
-    elif math_type == "geo" and bump_type == "inc":
-        value *= 1 + amount
-    elif math_type == "geo" and bump_type == "dec":
-        value /= 1 + amount
-
-    elif math_type == "mod" and bump_type == "inc":
-        value = (value + amount) % (bounds[1] - bounds[0] + 1)
-    elif math_type == "mod" and bump_type == "dec":
-        value = (value - amount) % (bounds[1] - bounds[0] + 1)
-
-    if bounds[0] != None and value <= bounds[0]:
-        return bounds[0]
-    elif bounds[1] != None and value >= bounds[1]:
-        return bounds[1]
-    else:
-        return value
-
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))

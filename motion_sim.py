@@ -86,10 +86,6 @@ def to_canvas():
         visual.pause()
 
 
-def change_modifier():
-    
-
-
 done = False
 playing = True
 cing = False
@@ -100,22 +96,22 @@ show_vectors = False
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
 #            call            name        value        scaling [SML]        bounds        unit    dp menu
-values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
-          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
-          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
-          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
-          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
-          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
-          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
-          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
-          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
+#values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
+#          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+#          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
+#          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
+#          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
+#          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
+#          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
+#          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
+#          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
+#          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
+#          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
 
-val_order = [a for a in values]
-val_mode = 0
-val_menu = 0
-val_name = "space"
+#val_order = [a for a in values]
+#val_mode = 0
+#val_menu = 0
+#val_name = "space"
 
 t = 0
 g = -9.80665

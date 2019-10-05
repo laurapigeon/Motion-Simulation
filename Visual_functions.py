@@ -8,16 +8,6 @@ def draw_text(text, coords, corner="topleft",
     text_rectangle.__setattr__(corner, coords)
     screen.blit(text_surface, text_rectangle)
 
-def values():
-    for i, name in enumerate(values):
-        value = values[name]
-        marker = ("", ">> ")[val_mode == i]
-        num_value = str(round(value[1], value[8]))
-        unit = value[7]
-        coords = (screen_pixel[0], screen_pixel[1] + 20*i - 20*(len(values)-1))
-        visual.draw_text(marker + "{}: {}".format(name, num_value + unit),
-                            coords, "bottomright")
-
 def resolution():
     visual.draw_text("({}, {})".format(*mechanical.list_round(*screen_pixel, 2)),
                         (screen_pixel[0], 0), "topright")
