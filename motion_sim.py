@@ -3,7 +3,8 @@ import os, sys, math, time, copy, pygame, random, colorsys
 pygame.init()
 pygame.font.init()
 
-from projectile_class import Projectile
+from particle_class import Particle
+from modifier_class import Modifier
 import math_functions as mechanical
 import visual_functions as visual
 
@@ -55,13 +56,13 @@ def check_inputs():
 
             if event.unicode in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
                 if cing:
-                    save = copy.deepcopy((projectiles, i_projectiles, values, t, playing))
+                    save = copy.deepcopy((particles, i_particles, values, t, playing))
                     saves[int(event.unicode)] = save
 
                 elif ving:
                     if saves[int(event.unicode)]:
                         save = copy.deepcopy(saves)[int(event.unicode)]
-                        projectiles, i_projectiles, values, t, playing = save
+                        particles, i_particles, values, t, playing = save
 
             if event.key == pygame.K_LSHIFT:
                 shifting = True
@@ -90,32 +91,32 @@ def check_inputs():
 
             if event.key == pygame.K_DELETE:
                 if shifting:
-                    for projectile in projectiles[::-1]:
-                        if not projectile.get_visible():
-                            projectiles.remove(projectile)
+                    for particle in particles[::-1]:
+                        if not particle.get_visible():
+                            particles.remove(particle)
 
                 elif ctrling:
-                    i_projectiles = []
-                    projectiles = []
+                    i_particles = []
+                    particles = []
                     t = 0
 
                 else:
-                    for projectile in projectiles[::-1]:
-                        if not projectile.fixed:
-                            projectiles.remove(projectile)
+                    for particle in particles[::-1]:
+                        if not particle.fixed:
+                            particles.remove(particle)
 
             elif event.key == pygame.K_BACKSPACE:
                 if shifting:
-                    if projectiles:
-                        del projectiles[0]
-                    elif i_projectiles:
-                        del i_projectiles[0]
+                    if particles:
+                        del particles[0]
+                    elif i_particles:
+                        del i_particles[0]
 
                 else:
-                    if i_projectiles:
-                        del i_projectiles[-1]
-                    elif projectiles:
-                        del projectiles[-1]
+                    if i_particles:
+                        del i_particles[-1]
+                    elif particles:
+                        del particles[-1]
 
             if event.key == pygame.K_LEFT:
                 multiplier = [64, 1]
@@ -136,42 +137,42 @@ def check_inputs():
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if event.button in (1, 3):
-                projectile_values = (values["charge"][1], 
-                                     values["mass"][1], 
-                                     values["radius"][1])
+                particle_values = (values["charge"][1], 
+                                   values["mass"][1], 
+                                   values["radius"][1])
 
-                if i_projectiles == []:
+                if i_particles == []:
                     if event.button == 1:
-                        i_projectiles.append(Projectile(*mouse_scale,
-                                                        *projectile_values,
+                        i_particles.append(particle(*mouse_scale,
+                                                        *particle_values,
                                                         fixed=False))
                     elif event.button == 3:
-                        fixed_projectile = Projectile(*mouse_scale,
-                                                      *projectile_values,
+                        fixed_particle = particle(*mouse_scale,
+                                                      *particle_values,
                                                       fixed=True)
 
-                        fixed_projectile.initiate(1, *mouse_scale)
-                        projectiles.append(fixed_projectile)
+                        fixed_particle.initiate(1, *mouse_scale)
+                        particles.append(fixed_particle)
 
                 else:
                     if shifting:
                         if event.button == 1:
-                            i_projectiles.append(Projectile(*mouse_scale,
-                                                            *projectile_values,
+                            i_particles.append(particle(*mouse_scale,
+                                                            *particle_values,
                                                             fixed=False))
                         elif event.button == 3:
-                            fixed_projectile = Projectile(*mouse_scale,
-                                                          *projectile_values,
+                            fixed_particle = particle(*mouse_scale,
+                                                          *particle_values,
                                                           fixed=True)
 
-                            fixed_projectile.initiate(1, *mouse_scale)
-                            projectiles.append(fixed_projectile)
+                            fixed_particle.initiate(1, *mouse_scale)
+                            particles.append(fixed_particle)
 
                     else:
-                        for i_projectile in i_projectiles:
-                            i_projectile.initiate(1, *mouse_scale)
-                            projectiles.append(i_projectile)
-                        i_projectiles = []
+                        for i_particle in i_particles:
+                            i_particle.initiate(1, *mouse_scale)
+                            particles.append(i_particle)
+                        i_particles = []
 
 
             if event.button in (4, 5):
@@ -198,16 +199,16 @@ def check_inputs():
             screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
 
 
-def update_projectiles(tick):
-    for projectile in projectiles[::-1]:
-        projectile.earth()
+def update_particles(tick):
+    for particle in particles[::-1]:
+        particle.earth()
 
-    for x, projectile in enumerate(projectiles):
-        if not projectile.fixed:
-            for prokectile in projectiles:
-                if projectile != prokectile:
+    for x, particle in enumerate(particles):
+        if not particle.fixed:
+            for prokectile in particles:
+                if particle != prokectile:
 
-                    dx, dy = mechanical.sub_vector(projectile.P_xs, projectile.P_ys, 
+                    dx, dy = mechanical.sub_vector(particle.P_xs, particle.P_ys, 
                                                 prokectile.P_xs, prokectile.P_ys)
                     r, θ = mechanical.combine(dx, dy)
 
@@ -216,47 +217,47 @@ def update_projectiles(tick):
 
                     if values["G"][1]:
                         F = mechanical.law_force(values["G"][1], r,
-                                                projectile.m, prokectile.m)
-                        projectile.apply_force(F, θ)
+                                                particle.m, prokectile.m)
+                        particle.apply_force(F, θ)
 
                     if values["k_e"][1]:
                         F = mechanical.law_force(values["k_e"][1], r,
-                                                projectile.Q, prokectile.Q)
-                        projectile.apply_force(-F, θ)
+                                                particle.Q, prokectile.Q)
+                        particle.apply_force(-F, θ)
 
-    for projectile in projectiles[::-1]:
-        projectile.update(tick)
+    for particle in particles[::-1]:
+        particle.update(tick)
 
 
-def to_canvas():
-    for i_projectile in i_projectiles:
-        if not i_projectile.fixed:
+def update_canvas():
+    for i_particle in i_particles:
+        if not i_particle.fixed:
 
-            i_projectile.draw_vector(dt=1, mouse=True)
+            i_particle.draw_vector(dt=1, mouse=True)
 
             if values["vis_vectors"][1] >= 2:
-                i_projectile.label_vector(mouse=True)
+                i_particle.label_vector(mouse=True)
 
-        i_projectile.draw_mass()
+        i_particle.draw_mass()
 
         if values["vis_values"][1] >= 1:
-            i_projectile.label_values(values["vis_values"][1])
+            i_particle.label_values(values["vis_values"][1])
 
 
-    for projectile in projectiles:
+    for particle in particles:
 
-        if not projectile.fixed:
+        if not particle.fixed:
 
             if values["vis_vectors"][1] >= 1:
-                projectile.draw_vector(1)
+                particle.draw_vector(1)
 
             if values["vis_vectors"][1] >= 2:
-                projectile.label_vector()
+                particle.label_vector()
 
-        projectile.draw_mass()
+        particle.draw_mass()
 
         if values["vis_values"][1] >= 1:
-            projectile.label_values(values["vis_values"][1])
+            particle.label_values(values["vis_values"][1])
 
     if values["vis_values"][1] >= 1:
         visual.mouse_pos()
@@ -265,7 +266,7 @@ def to_canvas():
     visual.values()
     visual.resolution()
     visual.time()
-    visual.projectile_count()
+    visual.particle_count()
 
     if not playing:
         visual.pause()
@@ -280,40 +281,47 @@ ctrling = False
 show_vectors = False
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
-#            call            name        value        scaling [SML]        bounds        unit    dp menu
-#values = {"space":       ["Space",        64,  "geo", 0.005, 0.05, 0.5, [None, None], "px/m",     0, 0],
-#          "screenx":     ["Screen X",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-#          "screeny":     ["Screen Y",     0,   "lin", 0.1,   1,    10,  [None, None], "m",        0, 0],
-#          "time":        ["Time",         1,   "lin", 0.01,  0.1,  1,   [None, None], "*t",       2, 1],
-#          "gravity":     ["Gravity",      0,   "lin", 0.01,  0.1,  1,   [None, None], "*g",       2, 1],
-#          "angle":       ["Angle",        270, "mod", 1,     5,    30,  [0, 359],     "deg",      0, 1],
-#          "G":           ["G",            1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2kg-2", 2, 1],
-#          "k_e":         ["k_e",          1,   "lin", 0.01,  0.1,  1,   [0, None],    "Nm^2C-2",  2, 1],
-#          "life":        ["Life",         0,   "lin", 0.1,   1,    10,  [0, 120],     "s",        1, 2],
-#          "vis_vectors": ["Show vectors", 0,   "mod", 1,     1,    1,   [0, 3],       "",         0, 3],
-#          "vis_values":  ["Show values",  0,   "mod", 1,     1,    1,   [0, 4],       "",         0, 3]}
+val_mode = 0
+val_menu = 0
 
-#val_order = [a for a in values]
-#val_mode = 0
-#val_menu = 0
-#val_name = "space"
+space = Modifier((64, "geo", (0.005, 0.05, 0.5), (None, None)), ("Screen scale", "px/m", 0))
+pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen X",     "m",    0))
+pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen Y",     "m",    0))
+screen_values = {"space": space, "pan_x": pan_x, "pan_y": pan_y}
+
+time_rate = Modifier((1,   "lin", (0.01, 0.1, 1),  (None, None)), ("Time rate",      "*t",      2))
+field_r   = Modifier((0,   "lin", (0.01, 0.1, 1),  (None, None)), ("Field strength", "ms-2",    2))
+field_θ   = Modifier((270, "mod", (1,    5,   30), (0,    359)),  ("Field angle",    "degrees", 0))
+G_const   = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("G",              "Nm2kg-2", 2))
+k_e_const = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("k_e",            "Nm2C-2",  2))
+universals = {"time_rate": time_rate, "field_r": field_r, "field_θ": field_θ, "G_const": G_const, "k_e_const" k_e_const}
+
+p_charge = Modifier((0,   "lin", (0.1,  1,   10), (None, None)), ("Q", "C",  1))
+p_mass   = Modifier((1,   "geo", (0.01, 0.1, 1),  (None, None)), ("M", "kg", 2))
+p_radius = Modifier((0.1, "geo", (0.01, 0.1, 1),  (None, None)), ("r", "m",  2))
+particle_inits = {"p_charge": p_charge, "p_mass": p_mass, "p_radius": p_radius}
+
+life        = Modifier((0, "lin", (0.1, 1, 10), (0, None)), ("particle life",   "m", 1))
+vis_vectors = Modifier((0, "mod", (1,   1, 1),  (0, 3)),    ("Vector detail",   "",  0))
+vis_values  = Modifier((0, "mod", (1,   1, 1),  (0, 4)),    ("Value detail",    "",  0))
+preferences = {"life": life, "vis_vectors": vis_vectors, "vis_values": vis_values}
 
 t = 0
 g = -9.80665
 
 screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
 
-i_projectiles = list()
-projectiles   = list()
+i_particles = list()
+particles   = list()
 
 while not done:
     check_inputs()
 
     if playing:
-        update_projectiles(values["time"][1] / tick)
+        update_particles(values["time"][1] / tick)
         t += values["time"][1] / tick
 
-    to_canvas()
+    update_canvas()
 
     clock.tick(tick)
     pygame.display.flip()

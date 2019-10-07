@@ -3,14 +3,13 @@ import os, sys, math, time, copy, pygame, random, colorsys
 class Modifier:
 
     def __init__(self, value, visual):
-        self.value   = value[0]
-        self.scaling = {"type": value[1],
-                        "amount": value[2:4],
-                        "bounds": value[5,6]}
+        self.value = self.default = value[0]
+        self.scaling = {"type":     value[1],
+                        "amount":   value[2:4],
+                        "bounds":   value[5,6]}
         self.name,
         self.unit,
-        self.dp,
-        self.menu = visual
+        self.dp = visual
 
     def bump(self, bump_type):
         amount = self.scaling["amount"][bump_magnitude]
@@ -34,3 +33,6 @@ class Modifier:
         num_value = str(round(self.name, self.dp)) + self.unit
         visual.draw_text(marker + "{}: {}".format(name, num_value),
                          (P_xp, P_yp), "bottomright")
+
+    def default(self):
+        self.value = self.default
