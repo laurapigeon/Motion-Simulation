@@ -1,27 +1,42 @@
-import os, sys, math, time, copy, pygame, random, colorsys
+if True: #IMPORTS/INITS
+    import os, sys, math, time, copy, pygame, random, colorsys
 
-pygame.init()
-pygame.font.init()
+    pygame.init()
+    pygame.font.init()
 
-from particle_class import Particle
-from modifier_class import Modifier
-import math_functions as mechanical
-import visual_functions as visual
+    from particle_class import Particle
+    from modifier_class import Modifier
+    import math_functions as mechanical
+    import visual_functions as visual
 
-pygame.display.set_caption("Us Simulation")
-screen_pixel = (1600, 900)
-screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
-fullscreen = False
+    pygame.display.set_caption("Us Simulation")
+    screen_pixel = (1600, 900)
+    screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
+    fullscreen = False
 
-clock = pygame.time.Clock()
-tick = 120
+    clock = pygame.time.Clock()
+    tick = 120
+
+    done = False
+    playing = True
+    saves = [(), (), (), (), (), (), (), (), (), ()]
+
+    val_mode = 0
+    val_menu = 0
+
+    t = 0
+    g = -9.80665
+
+    screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
+
+    i_particles = list()
+    particles   = list()
 
 
 def check_inputs():
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
     for event in events:
-
         if event.type == pygame.QUIT:
                 done = True
 
@@ -32,8 +47,7 @@ def check_inputs():
 
                 if keys[pygame.K_LSHIFT]:
                     for modifier_name in modifiers:
-                        modifier = modifiers[modifier_name]
-                        modifier.default()
+                        modifiers[modifier_name].default()
                     val_mode = 0
                 else:
                     done = True
@@ -59,10 +73,10 @@ def check_inputs():
                         particles, i_particles, modifiers, t, playing = save
 
             if event.key == pygame.K_DOWN:
-                val_mode = mechanical.bump(val_mode, 1, "mod", "inc", [0, len(values) - 1])
+                val_mode = mechanical.bump(val_mode, 1, "mod", "inc", [0, len(modifiers) - 1])
 
             elif event.key == pygame.K_UP:
-                val_mode = mechanical.bump(val_mode, 1, "mod", "dec", [0, len(values) - 1])
+                val_mode = mechanical.bump(val_mode, 1, "mod", "dec", [0, len(modifiers) - 1])
 
             if event.key == pygame.K_RIGHT:
                 val_menu = mechanical.bump(val_menu, 1, "mod", "inc", [0, 2])
@@ -84,7 +98,7 @@ def check_inputs():
                         if not particle.get_visible():
                             particles.remove(particle)
 
-                elif ctrling:
+                elif keys[pygame.K_LCTRL]:
                     i_particles = []
                     particles = []
                     t = 0
@@ -113,11 +127,11 @@ def check_inputs():
             if event.button in (1, 3):
                 if i_particles == []:
                     if event.button == 1:
-                        i_particles.append(particle(*mouse_scale,
+                        i_particles.append(Particle(*mouse_scale,
                                                     *particle_inits,
                                                     fixed=False))
                     elif event.button == 3:
-                        fixed_particle = particle(*mouse_scale,
+                        fixed_particle = Particle(*mouse_scale,
                                                   *particle_inits,
                                                   fixed=True)
 
@@ -127,11 +141,11 @@ def check_inputs():
                 else:
                     if keys[pygame.K_LSHIFT]:
                         if event.button == 1:
-                            i_particles.append(particle(*mouse_scale,
+                            i_particles.append(Particle(*mouse_scale,
                                                         *particle_inits,
                                                         fixed=False))
                         elif event.button == 3:
-                            fixed_particle = particle(*mouse_scale,
+                            fixed_particle = Particle(*mouse_scale,
                                                       *particle_inits,
                                                       fixed=True)
 
@@ -241,47 +255,34 @@ def update_canvas(vis_vectors, vis_values):
         visual.pause()
 
 
-done = False
-playing = True
-saves = [(), (), (), (), (), (), (), (), (), ()]
+if True: #MODIFIER DEFINITIONS
+    space = Modifier((64, "geo", (0.005, 0.05, 0.5), (None, None)), ("Screen scale", "px/m", 0))
+    pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen X",     "m",    0))
+    pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen Y",     "m",    0))
+    screen_values = {"space": space, "pan_x": pan_x, "pan_y": pan_y}
 
-val_mode = 0
-val_menu = 0
+    time_rate = Modifier((1,   "lin", (0.01, 0.1, 1),  (None, None)), ("Time rate",      "*t",      2))
+    field_r   = Modifier((0,   "lin", (0.01, 0.1, 1),  (None, None)), ("Field strength", "ms-2",    2))
+    field_θ   = Modifier((270, "mod", (1,    5,   30), (0,    359)),  ("Field angle",    "degrees", 0))
+    G_const   = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("G",              "Nm2kg-2", 2))
+    k_e_const = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("k_e",            "Nm2C-2",  2))
+    life      = Modifier((0,   "lin", (0.1,  1,   10), (0,    None)), ("particle life",  "m",       1))
+    universals = {"time_rate": time_rate, "field_r": field_r, "field_θ": field_θ,
+                  "G_const": G_const, "k_e_const": k_e_const, "life": life}
 
-space = Modifier((64, "geo", (0.005, 0.05, 0.5), (None, None)), ("Screen scale", "px/m", 0))
-pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen X",     "m",    0))
-pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen Y",     "m",    0))
-screen_values = {"space": space, "pan_x": pan_x, "pan_y": pan_y}
+    p_charge = Modifier((0,   "lin", (0.1,  1,   10), (None, None)), ("Q", "C",  1))
+    p_mass   = Modifier((1,   "geo", (0.01, 0.1, 1),  (None, None)), ("M", "kg", 2))
+    p_radius = Modifier((0.1, "geo", (0.01, 0.1, 1),  (None, None)), ("r", "m",  2))
+    particle_inits = {"p_charge": p_charge, "p_mass": p_mass, "p_radius": p_radius}
 
-time_rate = Modifier((1,   "lin", (0.01, 0.1, 1),  (None, None)), ("Time rate",      "*t",      2))
-field_r   = Modifier((0,   "lin", (0.01, 0.1, 1),  (None, None)), ("Field strength", "ms-2",    2))
-field_θ   = Modifier((270, "mod", (1,    5,   30), (0,    359)),  ("Field angle",    "degrees", 0))
-G_const   = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("G",              "Nm2kg-2", 2))
-k_e_const = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("k_e",            "Nm2C-2",  2))
-life      = Modifier((0,   "lin", (0.1,  1,   10), (0,    None)), ("particle life",  "m",       1))
-universals = {"time_rate": time_rate, "field_r": field_r, "field_θ": field_θ, 
-              "G_const": G_const, "k_e_const": k_e_const, "life": life}
+    vis_vectors = Modifier((0, "mod", (1, 1, 1), (0, 3)), ("Vector detail", "", 0))
+    vis_values  = Modifier((0, "mod", (1, 1, 1), (0, 4)), ("Value detail",  "", 0))
+    preferences = {"vis_vectors": vis_vectors, "vis_values": vis_values}
 
-p_charge = Modifier((0,   "lin", (0.1,  1,   10), (None, None)), ("Q", "C",  1))
-p_mass   = Modifier((1,   "geo", (0.01, 0.1, 1),  (None, None)), ("M", "kg", 2))
-p_radius = Modifier((0.1, "geo", (0.01, 0.1, 1),  (None, None)), ("r", "m",  2))
-particle_inits = {"p_charge": p_charge, "p_mass": p_mass, "p_radius": p_radius}
+    modifiers = {**screen_values, **universals, **particle_inits, **preferences}
 
-vis_vectors = Modifier((0, "mod", (1, 1, 1), (0, 3)), ("Vector detail", "", 0))
-vis_values  = Modifier((0, "mod", (1, 1, 1), (0, 4)), ("Value detail",  "", 0))
-preferences = {"vis_vectors": vis_vectors, "vis_values": vis_values}
 
-modifiers = {**screen_values, **universals, **particle_inits, **preferences}
-
-t = 0
-g = -9.80665
-
-screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
-
-i_particles = list()
-particles   = list()
-
-while not done:
+while not done: #PROGRAM LOOP
     check_inputs()
 
     if playing:
