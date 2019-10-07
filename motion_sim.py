@@ -4,8 +4,8 @@ if True: #IMPORTS/INITS
     pygame.init()
     pygame.font.init()
 
-    from particle_class import Particle
-    from modifier_class import Modifier
+    from Particle_class import Particle
+    from Modifier_class import Modifier
     import math_functions as mechanical
     import visual_functions as visual
 
@@ -243,16 +243,21 @@ def update_canvas(vis_vectors, vis_values):
             particle.label_values(vis_values)
 
     if vis_values >= 1:
-        visual.mouse_pos()
+        visual.mouse_pos(mouse_scale, mouse_pixel, screen_scale)
 
 
-    visual.values()
-    visual.resolution()
-    visual.time()
-    visual.particle_count()
+    height = 20 * len(modifiers)
+    for i, modifier in enumerate(modifiers.values):
+        marked = i == val_mode
+        modifier.display(screen_pixel[0], screen_pixel[1]-height, marked=marked)
+        height -= 20
+
+    visual.resolution(screen_pixel)
+    visual.time(t)
+    visual.particle_count(particles, i_particles)
 
     if not playing:
-        visual.pause()
+        visual.pause(screen_pixel)
 
 
 if True: #MODIFIER DEFINITIONS
