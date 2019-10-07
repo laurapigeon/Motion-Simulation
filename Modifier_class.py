@@ -11,7 +11,7 @@ class Modifier:
         self.unit,
         self.dp = visual
 
-    def bump(self, bump_type):
+    def bump(self, bump_type, bump_magnitude):
         amount = self.scaling["amount"][bump_magnitude]
         identity = (1,-1)[bump_type == "dec"]
         modulo = self.scaling["bounds"][1] - self.scaling["bounds"][0] + 1
