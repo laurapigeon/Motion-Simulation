@@ -261,10 +261,10 @@ def update_canvas(vis_vectors, vis_values):
 
 
 if True: #MODIFIER DEFINITIONS
-    space = Modifier((64, "geo", (0.005, 0.05, 0.5), (None, None)), ("Screen scale", "px/m", 0))
+    scale = Modifier((64, "geo", (0.005, 0.05, 0.5), (None, None)), ("Screen scale", "px/m", 0))
     pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen X",     "m",    0))
-    pan_x = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen Y",     "m",    0))
-    screen_values = {"space": space, "pan_x": pan_x, "pan_y": pan_y}
+    pan_y = Modifier((0,  "lin", (0.1,   1,    10),  (None, None)), ("Screen Y",     "m",    0))
+    screen_values = {"scale": scale, "pan_x": pan_x, "pan_y": pan_y}
 
     time_rate = Modifier((1,   "lin", (0.01, 0.1, 1),  (None, None)), ("Time rate",      "*t",      2))
     field_r   = Modifier((0,   "lin", (0.01, 0.1, 1),  (None, None)), ("Field strength", "ms-2",    2))

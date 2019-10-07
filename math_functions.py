@@ -26,18 +26,18 @@ def midpoint(x_1, y_1, x_2, y_2):
 def law_force(k, r, s_1, s_2):
     return k*s_1*s_2 / r**2
 
-def to_scale(x, y, P=False):
+def to_scale(x, y, screen_values, P=False):
     if P:
         x, y = sub_vector(*dot_product(*screen_pixel, 1/2), x, y)
-    x, y = dot_product(x, -1*y, 1/values["space"][1])
+    x, y = dot_product(x, -1*y, 1/screen_values["scale"].value)
     if P:
-        x, y = sub_vector(values["screenx"][1], values["screeny"][1], x, y)
+        x, y = sub_vector(screen_values["pan_x"].value, screen_values["pan_y"].value, x, y)
     return x, y
 
-def to_pixel(x, y, P=False):
+def to_pixel(x, y, screen_values, P=False):
     if P:
-        x, y = sum_vector(values["screenx"][1], values["screeny"][1], x, y)
-    x, y = dot_product(x, -1*y, values["space"][1])
+        x, y = sum_vector(screen_values["pan_x"].value, screen_values["pan_y"].value, x, y)
+    x, y = dot_product(x, -1*y, screen_values["scale"].value)
     if P:
         x, y = mechanical.sum_vector(*dot_product(*screen_pixel, 1/2), x, y)
     return x, y

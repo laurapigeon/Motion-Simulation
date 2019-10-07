@@ -2,7 +2,7 @@ import os, sys, math, time, copy, pygame, random, colorsys
 import math_functions as mechanical
 import visual_functions as visual
 
-class Projectile:
+class Particle:
     charge = 0
     mass = 1
     radius = 0.1
