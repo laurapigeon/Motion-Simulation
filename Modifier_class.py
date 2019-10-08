@@ -1,4 +1,5 @@
 import os, sys, math, time, copy, pygame, random, colorsys
+import visual_functions as visual
 
 class Modifier:
 
@@ -6,10 +7,8 @@ class Modifier:
         self.value = self.default = value[0]
         self.scaling = {"type":     value[1],
                         "amount":   value[2:4],
-                        "bounds":   value[5,6]}
-        self.name,
-        self.unit,
-        self.dp = visual
+                        "bounds":   value[5:6]}
+        self.name, self.unit, self.dp = visual
 
     def bump(self, bump_type, bump_magnitude):
         amount = self.scaling["amount"][bump_magnitude]
@@ -28,10 +27,10 @@ class Modifier:
         elif self.scaling["bounds"][1] != None:
             self.value = max(self.scaling["bounds"][1], self.value)
 
-    def display(self, P_xp, P_yp, marked=False):
+    def display(self, screen, P_xp, P_yp, marked=False):
         marker = ("", ">> ")[marked]
-        num_value = str(round(self.name, self.dp)) + self.unit
-        visual.draw_text(marker + "{}: {}".format(name, num_value),
+        num_value = str(round(self.value, self.dp)) + self.unit
+        visual.draw_text(screen, marker + "{}: {}".format(self.name, num_value),
                          (P_xp, P_yp), "bottomright")
 
     def default(self):

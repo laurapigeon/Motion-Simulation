@@ -45,7 +45,7 @@ class Particle:
                 projectiles.remove(self)
 
     def get_pos(self, screen_vals):
-        scale, pan_x, pan_y = *[modifier.value for modifier in screen_vals.value()]
+        scale, pan_x, pan_y = [modifier.value for modifier in screen_vals.value()]
         return mechanical.to_pixel(self.P_xs, self.P_ys, scale, pan_x, pan_y, point=True)
 
     def get_dead(self, life):
@@ -69,7 +69,7 @@ class Particle:
                                      mechanical.sigmoid(self.m/4 - 2), L)
         return (colour[0]*255, colour[1]*255, colour[2]*255)
 
-    def draw_mass(self, screen_vals):
+    def draw_mass(self, screen, screen_vals):
         P_xp, P_yp = mechanical.list_round(*self.get_pos(screen_vals))
 
         r_p, _ = mechanical.to_pixel(self.r_s, 0, screen_vals)
@@ -79,7 +79,7 @@ class Particle:
             pygame.draw.circle(screen, self.dark_colour, (P_xp, P_yp), round(r_p / 2))
             
 
-    def draw_vector(self, screen_vals, dt=1, mouse=False):
+    def draw_vector(self, screen, screen_vals, dt=1, mouse=False):
             P_x1p, P_y1p = self.get_pos(screen_vals)
 
             if mouse:
@@ -94,26 +94,26 @@ class Particle:
 
             pygame.draw.line(screen, self.dark_colour, (P_x1p, P_y1p), (P_x2p, P_y2p), r_p)
 
-    def label_values(self, value, screen_vals):
+    def label_values(self, screen, value, screen_vals):
         P_xs, P_ys = mechanical.list_round(self.P_xs, self.P_ys + screen_scale[1], 2)
         P_xp, P_yp = mechanical.list_round(*self.get_pos(screen_vals), 2)
 
         offset = 10
         if value == 1 or value == 4:
-            visual.draw_text("({}m, {}m)".format(P_xs, P_ys),
+            visual.draw_text(screen, "({}m, {}m)".format(P_xs, P_ys),
                              (P_xp, P_yp+offset), "midtop", (self.light_colour))
             offset += 20
 
         if value == 2 or value == 4:
-            visual.draw_text("{}kg".format(self.m),
+            visual.draw_text(screen, "{}kg".format(self.m),
                              (P_xp, P_yp+offset), "midtop", (self.light_colour))
             offset += 20
 
         if value == 3 or value == 4:
-            visual.draw_text("{}C".format(self.Q),
+            visual.draw_text(screen, "{}C".format(self.Q),
                              (P_xp, P_yp+offset), "midtop", (self.light_colour))
 
-    def label_vector(self, screen_vals, mouse=False):
+    def label_vector(self, screen, screen_vals, mouse=False):
         P_x1p, P_y1p = self.get_pos(screen_vals)
 
         if mouse:
@@ -128,7 +128,7 @@ class Particle:
 
         P_xmp, P_ymp = mechanical.midpoint(P_x1p, P_y1p, P_x2p, P_y2p)
 
-        visual.draw_text(str(round(v_s, 2)) + "ms-1",
+        visual.draw_text(screen, str(round(v_s, 2)) + "ms-1",
                          (P_xmp, P_ymp), "center", self.light_colour)
-        visual.draw_text(str(round(math.degrees(θ_s), 2)) + "°",
+        visual.draw_text(screen, str(round(math.degrees(θ_s), 2)) + "°",
                          (P_x1p, P_y1p), "topleft", self.light_colour)

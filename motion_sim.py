@@ -17,25 +17,12 @@ fullscreen = False
 clock = pygame.time.Clock()
 tick = 120
 
-done = False
-playing = True
-saves = [(), (), (), (), (), (), (), (), (), ()]
-
-val_mode = 0
-val_menu = 0
-
-t = 0
-g = -9.80665
-
-screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
-
-i_particles = list()
-particles   = list()
-
 #endregion
 
 
-def check_inputs():
+def check_inputs(screen_vals):
+    global screen, i_particles, particles, mouse_scale
+
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
     for event in events:
@@ -180,11 +167,13 @@ def check_inputs():
 
         if event.type == pygame.VIDEORESIZE:
             screen_pixel = (event.w, event.h)
-            screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1])
+            screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1], screen_vals)
             screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
 
 
 def update_particles(tick, universals):
+    global i_particles, particles, mouse_scale
+
     for particle in particles[::-1]:
         particle.earth(universals["field_r"].value, universals["field_θ"].value)
 
@@ -214,19 +203,23 @@ def update_particles(tick, universals):
         particle.update(tick, screen, preferences["life"].value, screen_vals)
 
 
-def update_canvas(vis_vectors, vis_values):
+def update_canvas(screen, vis_vectors, vis_values):
+    global i_particles, particles, mouse_scale
+    
+    visual.blank(screen)
+
     for i_particle in i_particles:
         if not i_particle.fixed:
 
-            i_particle.draw_vector(screen_vals, dt=1, mouse=True)
+            i_particle.draw_vector(screen, screen_vals, dt=1, mouse=True)
 
             if vis_vectors >= 2:
-                i_particle.label_vector(screen_vals, mouse=True)
+                i_particle.label_vector(screen, screen_vals, mouse=True)
 
-        i_particle.draw_mass(screen_vals)
+        i_particle.draw_mass(screen, screen_vals)
 
         if vis_values >= 1:
-            i_particle.label_values(vis_values, screen_vals)
+            i_particle.label_values(screen, vis_values, screen_vals)
 
 
     for particle in particles:
@@ -234,32 +227,32 @@ def update_canvas(vis_vectors, vis_values):
         if not particle.fixed:
 
             if vis_vectors >= 1:
-                particle.draw_vector(screen_vals, dt=1)
+                particle.draw_vector(screen, screen_vals, dt=1)
 
             if vis_vectors >= 2:
-                particle.label_vector(screen_vals)
+                particle.label_vector(screen, screen_vals)
 
-        particle.draw_mass(screen_vals)
+        particle.draw_mass(screen, screen_vals)
 
         if vis_values >= 1:
-            particle.label_values(vis_values, screen_vals)
+            particle.label_values(screen, vis_values, screen_vals)
 
     if vis_values >= 1:
-        visual.mouse_pos(mouse_scale, mouse_pixel, screen_scale)
+        visual.mouse_pos(screen, mouse_scale, mouse_pixel, screen_scale)
 
 
     height = 20 * len(modifiers)
     for i, modifier in enumerate(modifiers.values()):
         marked = i == val_mode
-        modifier.display(screen_pixel[0], screen_pixel[1]-height, marked=marked)
+        modifier.display(screen, screen_pixel[0], screen_pixel[1]-height, marked=marked)
         height -= 20
 
-    visual.resolution(screen_pixel)
-    visual.time(t)
-    visual.particle_count(particles, i_particles)
+    visual.resolution(screen, screen_pixel, screen_scale)
+    visual.time(screen, t)
+    visual.particle_count(screen, particles, i_particles)
 
     if not playing:
-        visual.pause(screen_pixel)
+        visual.pause(screen, screen_pixel)
 
 
 #region MODIFIER DEFINITIONS
@@ -286,19 +279,38 @@ vis_vectors = Modifier((0, "mod", (1, 1, 1), (0, 3)), ("Vector detail", "", 0))
 vis_values  = Modifier((0, "mod", (1, 1, 1), (0, 4)), ("Value detail",  "", 0))
 preferences = {"vis_vectors": vis_vectors, "vis_values": vis_values}
 
-modifiers = {**screen, **universals, **particle_inits, **preferences}
+modifiers = {**screen_vals, **universals, **particle_inits, **preferences}
+
+#endregion
+
+
+#region LOOP VARIABLES
+done = False
+playing = True
+saves = [(), (), (), (), (), (), (), (), (), ()]
+
+val_mode = 0
+val_menu = 0
+
+t = 0
+g = -9.80665
+
+screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1], screen_vals)
+
+i_particles = list()
+particles = list()
 
 #endregion
 
 
 while not done: #PROGRAM LOOP
-    check_inputs()
+    check_inputs(screen_vals)
 
     if playing:
-        update_particles(universals["time_rate"][1] / tick, universals)
-        t += universals["time_rate"][1] / tick
+        update_particles(universals["time_rate"].value / tick, universals)
+        t += universals["time_rate"].value / tick
 
-    update_canvas(*preferences)
+    update_canvas(screen, preferences["vis_vectors"].value, preferences["vis_values"].value)
 
     clock.tick(tick)
     pygame.display.flip()
