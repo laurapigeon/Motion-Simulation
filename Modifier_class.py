@@ -1,4 +1,7 @@
 import os, sys, math, time, copy, pygame, random, colorsys
+
+import config
+
 import visual_functions as visual
 
 class Modifier:

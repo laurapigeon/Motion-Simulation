@@ -1,5 +1,7 @@
 import os, sys, math, time, copy, pygame, random, colorsys
 
+import config
+
 def resolve(v, θ):
     x = v * math.cos(θ)
     y = v * math.sin(θ)
@@ -28,7 +30,7 @@ def law_force(k, r, s_1, s_2):
     return k*s_1*s_2 / r**2
 
 def list_abs(x, y):
-    return  abs(x), abs(y)
+    return abs(x), abs(y)
 
 def list_round(x, y, digits=0):
     if not digits:
@@ -42,24 +44,24 @@ def sigmoid(x):
 
 def to_scale(x, y, point=False):
     if point:
-        x, y = sub_vector(*dot_product(*globals()["screen_pixel"], 1/2), x, y)
+        x, y = sub_vector(*dot_product(*config.screen_pixel, 1/2), x, y)
 
-    x, y = dot_product(x, -1*y, 1/globals()["screen_vals"]["zoom"].value)
+    x, y = dot_product(x, -1*y, 1/config.screen_vals["zoom"].value)
 
     if point:
-        pan_x, pan_y = globals()["screen_vals"]["pan_x"].value, globals()["screen_vals"]["pan_y"].value
+        pan_x, pan_y = config.screen_vals["pan_x"].value, config.screen_vals["pan_y"].value
         x, y = sub_vector(pan_x, pan_y, x, y)
 
     return x, y
 
 def to_pixel(x, y, point=False):
     if point:
-        pan_x, pan_y = globals()["screen_vals"]["pan_x"].value, globals()["screen_vals"]["pan_y"].value
+        pan_x, pan_y = config.screen_vals["pan_x"].value, config.screen_vals["pan_y"].value
         x, y = sum_vector(pan_x, pan_y, x, y)
 
-    x, y = dot_product(x, -1*y, globals()["screen_vals"]["zoom"].value)
+    x, y = dot_product(x, -1*y, config.screen_vals["zoom"].value)
 
     if point:
-        x, y = mechanical.sum_vector(*dot_product(*globals()["screen_pixel"], 1/2), x, y)
+        x, y = mechanical.sum_vector(*dot_product(*config.screen_pixel, 1/2), x, y)
 
     return x, y

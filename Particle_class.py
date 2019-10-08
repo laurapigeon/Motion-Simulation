@@ -1,4 +1,7 @@
 import os, sys, math, time, copy, pygame, random, colorsys
+
+import config
+
 import math_functions as mechanical
 import visual_functions as visual
 
