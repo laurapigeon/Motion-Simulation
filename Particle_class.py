@@ -69,7 +69,7 @@ class Particle:
                                      mechanical.sigmoid(self.m/4 - 2), L)
         return (colour[0]*255, colour[1]*255, colour[2]*255)
 
-    def draw_mass(self, scale, pan_x, pan_y):
+    def draw_mass(self, screen_vals):
         P_xp, P_yp = mechanical.list_round(*self.get_pos(screen_vals))
 
         r_p, _ = mechanical.to_pixel(self.r_s, 0, screen_vals)

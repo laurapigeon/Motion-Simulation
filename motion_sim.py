@@ -218,15 +218,15 @@ def update_canvas(vis_vectors, vis_values):
     for i_particle in i_particles:
         if not i_particle.fixed:
 
-            i_particle.draw_vector(dt=1, mouse=True)
+            i_particle.draw_vector(screen_vals, dt=1, mouse=True)
 
             if vis_vectors >= 2:
-                i_particle.label_vector(mouse=True)
+                i_particle.label_vector(screen_vals, mouse=True)
 
-        i_particle.draw_mass()
+        i_particle.draw_mass(screen_vals)
 
         if vis_values >= 1:
-            i_particle.label_values(vis_values)
+            i_particle.label_values(vis_values, screen_vals)
 
 
     for particle in particles:
@@ -234,15 +234,15 @@ def update_canvas(vis_vectors, vis_values):
         if not particle.fixed:
 
             if vis_vectors >= 1:
-                particle.draw_vector(1)
+                particle.draw_vector(screen_vals, dt=1)
 
             if vis_vectors >= 2:
-                particle.label_vector()
+                particle.label_vector(screen_vals)
 
-        particle.draw_mass()
+        particle.draw_mass(screen_vals)
 
         if vis_values >= 1:
-            particle.label_values(vis_values)
+            particle.label_values(vis_values, screen_vals)
 
     if vis_values >= 1:
         visual.mouse_pos(mouse_scale, mouse_pixel, screen_scale)

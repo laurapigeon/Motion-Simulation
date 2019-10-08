@@ -8,7 +8,7 @@ def draw_text(text, coords, corner="topleft",
     text_rectangle.__setattr__(corner, coords)
     screen.blit(text_surface, text_rectangle)
 
-def resolution(screen_pixel):
+def resolution(screen_pixel, screen_scale):
     visual.draw_text("({}, {})".format(*mechanical.list_round(*screen_pixel, 2)),
                      (screen_pixel[0], 0), "topright")
 
