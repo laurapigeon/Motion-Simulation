@@ -20,11 +20,15 @@ tick = 120
 #endregion
 
 
-def check_inputs(screen_vals):
-    global screen, i_particles, particles, mouse_scale
+def check_inputs():
+    global screen, screen_pixel, mouse_pixel
+    global i_particles, particles
+    global screen_vals
+    global t, tick
 
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
+
     for event in events:
         if event.type == pygame.QUIT:
                 done = True
@@ -114,6 +118,8 @@ def check_inputs(screen_vals):
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if event.button in (1, 3):
+                mouse_scale = mechanical.to_scale(*mouse_pixel, screen_vals, point=True)
+
                 if i_particles == []:
                     if event.button == 1:
                         i_particles.append(Particle(*mouse_scale,
@@ -167,12 +173,17 @@ def check_inputs(screen_vals):
 
         if event.type == pygame.VIDEORESIZE:
             screen_pixel = (event.w, event.h)
-            screen_scale = mechanical.to_scale(screen_pixel[0], -1 * screen_pixel[1], screen_vals)
-            screen = pygame.display.set_mode((screen_pixel[0], screen_pixel[1]), pygame.RESIZABLE)
+            screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
 
-def update_particles(tick, universals):
-    global i_particles, particles, mouse_scale
+        if event.type == pygame.MOUSEMOTION:
+            mouse_pixel = pygame.mouse.get_pos()
+
+
+def update_particles(dt):
+    global mouse_pixel
+    global i_particles, particles
+    global universals
 
     for particle in particles[::-1]:
         particle.earth(universals["field_r"].value, universals["field_θ"].value)
@@ -200,12 +211,16 @@ def update_particles(tick, universals):
                         particle.apply_force(-F, θ)
 
     for particle in particles[::-1]:
-        particle.update(tick, screen, preferences["life"].value, screen_vals)
+        particle.update(dt, screen, preferences["life"].value, screen_vals)
 
 
-def update_canvas(screen, vis_vectors, vis_values):
-    global i_particles, particles, mouse_scale
-    
+def update_canvas():
+    global screen, screen_pixel, mouse_pixel   
+    global i_particles, particles
+    global preferences
+
+    vis_vectors, vis_values = preferences["vis_vectors"].value, preferences["vis_values"].value
+
     visual.blank(screen)
 
     for i_particle in i_particles:
@@ -289,6 +304,8 @@ done = False
 playing = True
 saves = [(), (), (), (), (), (), (), (), (), ()]
 
+mouse_pixel = pygame.mouse.get_pos()
+
 val_mode = 0
 val_menu = 0
 
@@ -304,13 +321,13 @@ particles = list()
 
 
 while not done: #PROGRAM LOOP
-    check_inputs(screen_vals)
+    check_inputs()
 
     if playing:
-        update_particles(universals["time_rate"].value / tick, universals)
+        update_particles(universals["time_rate"].value / tick)
         t += universals["time_rate"].value / tick
 
-    update_canvas(screen, preferences["vis_vectors"].value, preferences["vis_values"].value)
+    update_canvas()
 
     clock.tick(tick)
     pygame.display.flip()
