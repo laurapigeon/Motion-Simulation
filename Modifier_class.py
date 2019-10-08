@@ -27,10 +27,10 @@ class Modifier:
         elif self.scaling["bounds"][1] != None:
             self.value = max(self.scaling["bounds"][1], self.value)
 
-    def display(self, screen, P_xp, P_yp, marked=False):
+    def display(self, P_xp, P_yp, marked=False):
         marker = ("", ">> ")[marked]
         num_value = str(round(self.value, self.dp)) + self.unit
-        visual.draw_text(screen, marker + "{}: {}".format(self.name, num_value),
+        visual.draw_text(marker + "{}: {}".format(self.name, num_value),
                          (P_xp, P_yp), "bottomright")
 
     def default(self):
