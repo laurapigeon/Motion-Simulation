@@ -24,8 +24,7 @@ def particle_count(particles, i_particles):
 def mouse_pos(mouse_scale, mouse_pixel, screen_scale):
     num_value = mechanical.list_round(mouse_scale[0], mouse_scale[1] + screen_scale[1], 2)
     coords = (mouse_pixel[0], mouse_pixel[1] + 10)
-    visual.draw_text("({}m, {}m)".format(*num_value),
-                        coords, "midtop")
+    visual.draw_text("({}m, {}m)".format(*num_value), coords, "midtop")
 
 def pause(screen_pixel):
     for i in range(2):
