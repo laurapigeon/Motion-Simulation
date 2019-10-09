@@ -1,6 +1,5 @@
 Features to add:
 
-Tab through menu sections
 Camera Focus
 Load states (p motion, 0 g, etc)
  > projectile motion
@@ -29,6 +28,7 @@ Boids
  > cohesion
 Modify existing body
 Precise vector creation
+Consistant mass distribution
 
 
 Added features:
@@ -46,3 +46,5 @@ Shift click for multiple projectiles
 Frame advance and pause
 Save states
 Space panning
+Tabbable modifier menus
+Config file

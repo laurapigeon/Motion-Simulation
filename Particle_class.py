@@ -23,7 +23,7 @@ class Particle:
         self.v_xs, self.v_ys = mechanical.dot_product(dP_xs, dP_ys, dt)
 
     def earth(self):
-        field_r, field_θ = config.field_r.value, config.field_θ.value
+        field_r, field_θ = -config.field_r.value, config.field_θ.value
 
         self.F_xs, self.F_ys = mechanical.resolve(-1*self.m*field_r,
                                                   math.radians(field_θ))

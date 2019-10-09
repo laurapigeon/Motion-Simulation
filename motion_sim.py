@@ -28,14 +28,15 @@ def check_inputs():
             if event.key == pygame.K_ESCAPE:
 
                 if keys[pygame.K_LSHIFT]:
-                    for modifier in mod_group.values():
-                        modifier.default()
-                    config.mod_mode = 0
+                    for modifier in config.modifiers.values():
+                        Modifier.default(modifier)
+                    config.mod_mode.value = 0
+                    config.t = 0
                 else:
                     done = True
 
             if event.key == pygame.K_p:
-                playing = not playing
+                config.playing = not config.playing
 
             if event.key == pygame.K_f:
                     if config.fullscreen:
@@ -46,13 +47,13 @@ def check_inputs():
 
             if event.unicode in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
                 if keys[pygame.K_c]:
-                    save = copy.deepcopy((config.particles, config.i_particles, modifiers, t, playing))
-                    saves[int(event.unicode)] = save
+                    save = copy.deepcopy((config.particles, config.i_particles, config.modifiers, config.t, config.playing))
+                    config.saves[int(event.unicode)] = save
 
                 elif keys[pygame.K_v]:
-                    if saves[int(event.unicode)]:
-                        save = copy.deepcopy(saves)[int(event.unicode)]
-                        config.particles, config.i_particles, modifiers, t, playing = save
+                    if config.saves[int(event.unicode)]:
+                        save = copy.deepcopy(config.saves)[int(event.unicode)]
+                        config.particles, config.i_particles, config.modifiers, config.t, config.playing = save
 
             if event.key == pygame.K_DOWN:
                 config.mod_mode.bump("inc", 1)
@@ -73,12 +74,24 @@ def check_inputs():
                 config.mod_mode.scaling["bounds"][1] = len(config.mod_group)-1
 
             if event.key == pygame.K_PERIOD:
-                t += 1 / tick
-                mechanical.tick(1 / tick)
+                frames = 10
+                if keys[pygame.K_LSHIFT]:
+                    frames = 1
+                if keys[pygame.K_LCTRL]:
+                    frames = 100
+
+                config.t += frames / config.tick
+                update_particles(frames / config.tick)
 
             elif event.key == pygame.K_COMMA:
-                t -= 1 / tick
-                mechanical.tick(-1 / tick)
+                frames = 10
+                if keys[pygame.K_LSHIFT]:
+                    frames = 1
+                if keys[pygame.K_LCTRL]:
+                    frames = 100
+
+                config.t -= frames / config.tick
+                update_particles(-frames / config.tick)
 
             if event.key == pygame.K_DELETE:
                 if keys[pygame.K_LSHIFT]:
@@ -89,9 +102,9 @@ def check_inputs():
                 elif keys[pygame.K_LCTRL]:
                     config.i_particles = list()
                     config.particles = list()
-                    config.t = 0
 
                 else:
+                    config.i_particles = list()
                     for particle in config.particles[::-1]:
                         if not particle.fixed:
                             config.particles.remove(particle)
