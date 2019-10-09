@@ -46,22 +46,22 @@ def to_scale(x, y, point=False):
     if point:
         x, y = sub_vector(*dot_product(*config.screen_pixel, 1/2), x, y)
 
-    x, y = dot_product(x, -1*y, 1/config.screen_vals["zoom"].value)
+    x, y = dot_product(x, -1*y, 1/config.screen_mods["zoom"].value)
 
     if point:
-        pan_x, pan_y = config.screen_vals["pan_x"].value, config.screen_vals["pan_y"].value
+        pan_x, pan_y = config.screen_mods["pan_x"].value, config.screen_mods["pan_y"].value
         x, y = sub_vector(pan_x, pan_y, x, y)
 
     return x, y
 
 def to_pixel(x, y, point=False):
     if point:
-        pan_x, pan_y = config.screen_vals["pan_x"].value, config.screen_vals["pan_y"].value
+        pan_x, pan_y = config.screen_mods["pan_x"].value, config.screen_mods["pan_y"].value
         x, y = sum_vector(pan_x, pan_y, x, y)
 
-    x, y = dot_product(x, -1*y, config.screen_vals["zoom"].value)
+    x, y = dot_product(x, -1*y, config.screen_mods["zoom"].value)
 
     if point:
-        x, y = mechanical.sum_vector(*dot_product(*config.screen_pixel, 1/2), x, y)
+        x, y = sum_vector(*dot_product(*config.screen_pixel, 1/2), x, y)
 
     return x, y

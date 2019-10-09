@@ -7,21 +7,18 @@ from Modifier_class import Modifier
 import math_functions as mechanical
 import visual_functions as visual
 
-config.init()
 #endregion
 
 
 def check_inputs():
-    global i_particles, particles
-    global screen_vals
-    global t, tick
+    global done
 
     keys = pygame.key.get_pressed()
     events = pygame.event.get()
 
     for event in events:
         if event.type == pygame.QUIT:
-                done = True
+            done = True
 
 
         if event.type == pygame.KEYDOWN:
@@ -29,9 +26,9 @@ def check_inputs():
             if event.key == pygame.K_ESCAPE:
 
                 if keys[pygame.K_LSHIFT]:
-                    for modifier_name in modifiers:
-                        modifiers[modifier_name].default()
-                    val_mode = 0
+                    for modifier in mod_group.values():
+                        modifier.default()
+                    config.mod_mode = 0
                 else:
                     done = True
 
@@ -39,33 +36,39 @@ def check_inputs():
                 playing = not playing
 
             if event.key == pygame.K_f:
-                    if fullscreen:
+                    if config.fullscreen:
                         config.screen = pygame.display.set_mode(config.screen_pixel, pygame.RESIZABLE)
                     else:
                         config.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-                    fullscreen = not fullscreen
+                    config.fullscreen = not config.fullscreen
 
             if event.unicode in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"):
                 if keys[pygame.K_c]:
-                    save = copy.deepcopy((particles, i_particles, modifiers, t, playing))
+                    save = copy.deepcopy((config.particles, config.i_particles, modifiers, t, playing))
                     saves[int(event.unicode)] = save
 
                 elif keys[pygame.K_v]:
                     if saves[int(event.unicode)]:
                         save = copy.deepcopy(saves)[int(event.unicode)]
-                        particles, i_particles, modifiers, t, playing = save
+                        config.particles, config.i_particles, modifiers, t, playing = save
 
             if event.key == pygame.K_DOWN:
-                val_mode = mechanical.bump(val_mode, 1, "mod", "inc", [0, len(modifiers) - 1])
+                config.mod_mode.bump("inc", 1)
 
             elif event.key == pygame.K_UP:
-                val_mode = mechanical.bump(val_mode, 1, "mod", "dec", [0, len(modifiers) - 1])
+                config.mod_mode.bump("dec", 1)
 
             if event.key == pygame.K_RIGHT:
-                val_menu = mechanical.bump(val_menu, 1, "mod", "inc", [0, 2])
+                config.mod_menu.bump("inc", 1)
+                config.mod_group = config.mod_groups[config.mod_menu.value]
+                config.mod_mode.value = 0
+                config.mod_mode.scaling["bounds"][1] = len(config.mod_group)-1
 
             elif event.key == pygame.K_LEFT:
-                val_menu = mechanical.bump(val_menu, 1, "mod", "dec", [0, 2])
+                config.mod_menu.bump("dec", 1)
+                config.mod_group = config.mod_groups[config.mod_menu.value]
+                config.mod_mode.value = 0
+                config.mod_mode.scaling["bounds"][1] = len(config.mod_group)-1
 
             if event.key == pygame.K_PERIOD:
                 t += 1 / tick
@@ -77,69 +80,65 @@ def check_inputs():
 
             if event.key == pygame.K_DELETE:
                 if keys[pygame.K_LSHIFT]:
-                    for particle in particles[::-1]:
+                    for particle in config.particles[::-1]:
                         if not particle.get_visible():
-                            particles.remove(particle)
+                            config.particles.remove(particle)
 
                 elif keys[pygame.K_LCTRL]:
-                    i_particles = []
-                    particles = []
-                    t = 0
+                    config.i_particles = list()
+                    config.particles = list()
+                    config.t = 0
 
                 else:
-                    for particle in particles[::-1]:
+                    for particle in config.particles[::-1]:
                         if not particle.fixed:
-                            particles.remove(particle)
+                            config.particles.remove(particle)
 
             elif event.key == pygame.K_BACKSPACE:
+                index = -1
                 if keys[pygame.K_LSHIFT]:
-                    if particles:
-                        del particles[0]
-                    elif i_particles:
-                        del i_particles[0]
-
-                else:
-                    if i_particles:
-                        del i_particles[-1]
-                    elif particles:
-                        del particles[-1]
+                    index += 1
+                if config.i_particles:
+                    del config.i_particles[index]
+                elif config.particles:
+                    del config.particles[index]
 
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if event.button in (1, 3):
                 pos    = config.mouse_scale
-                charge = config.particle_inits["charge"].value
-                mass   = config.particle_inits["mass"].value
-                radius = config.particle_inits["radius"].value
+                charge = config.particle_inits["p_charge"].value
+                mass   = config.particle_inits["p_mass"].value
+                radius = config.particle_inits["p_radius"].value
 
-                if i_particles == []:
+                if config.i_particles == []:
                     if event.button == 1:
-                        i_particles.append(Particle(*pos, charge, mass, radius, fixed=False))
+                        config.i_particles.append(Particle(*pos, charge, mass, radius, fixed=False))
                     elif event.button == 3:
                         fixed_particle = Particle(*pos, charge, mass, radius, fixed=True)
 
                         fixed_particle.initiate(1, *pos)
-                        particles.append(fixed_particle)
+                        config.particles.append(fixed_particle)
 
                 else:
                     if keys[pygame.K_LSHIFT]:
                         if event.button == 1:
-                            i_particles.append(Particle(*pos, charge, mass, radius, fixed=False))
+                            config.i_particles.append(Particle(*pos, charge, mass, radius, fixed=False))
                         elif event.button == 3:
                             fixed_particle = Particle(*pos, charge, mass, radius, fixed=True)
 
                             fixed_particle.initiate(1, *pos)
-                            particles.append(fixed_particle)
+                            config.particles.append(fixed_particle)
 
                     else:
-                        for i_particle in i_particles:
+                        for i_particle in config.i_particles:
                             i_particle.initiate(1, *pos)
-                            particles.append(i_particle)
-                        i_particles = []
+                            config.particles.append(i_particle)
+                        config.i_particles = []
 
             if event.button in (4, 5):
-                modifier = modifiers.values[val_mode]
+                modifier = list(config.mod_group.values())[config.mod_mode.value]
                 magnitude = 1
 
                 if keys[pygame.K_LSHIFT]:
@@ -153,36 +152,33 @@ def check_inputs():
                 modifier.bump(bump_type, magnitude)
 
                 if modifier.name == "Screen zoom":
-                    config.screen_scale = mechanical.to_scale(*screen_pixel)
-                    #MUST UPDATE SCREEN SCALE FOR GLOBALS WHEN SCREEN ZOOM CHANGES
+                    config.screen_scale = mechanical.to_scale(*config.screen_pixel)
+                    #MUST UPDATE SCREEN SCALE FOR CONFIG WHEN SCREEN ZOOM CHANGES
 
                 if modifier.name in ("Screen zoom", "Screen X", "Screen Y"):
-                    config.mouse_scale = mechanical.to_scale(*mouse_pixel, point=True)
-                    #MUST UPDATE MOUSE SCALE FOR GLOBALS WHEN SCREEN ZOOM OR PAN CHANGES
+                    config.mouse_scale = mechanical.to_scale(*config.mouse_pixel, point=True)
+                    #MUST UPDATE MOUSE SCALE FOR CONFIG WHEN SCREEN ZOOM OR PAN CHANGES
 
 
         if event.type == pygame.VIDEORESIZE:
-            screen_pixel = (event.w, event.h)
-            config.screen_scale = mechanical.to_scale(*screen_pixel)
+            config.screen_pixel = (event.w, event.h)
+            config.screen_scale = mechanical.to_scale(*config.screen_pixel)
             screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
 
         if event.type == pygame.MOUSEMOTION:
-            mouse_pixel = pygame.mouse.get_pos()
-            config.screen_scale = mechanical.to_scale(*mouse_pixel, point=True)
+            config.mouse_pixel = pygame.mouse.get_pos()
+            config.screen_scale = mechanical.to_scale(*config.mouse_pixel, point=True)
 
 
 def update_particles(dt):
-    global mouse_pixel
-    global i_particles, particles
-    global universals
 
-    for particle in particles[::-1]:
+    for particle in config.particles[::-1]:
         particle.earth()
 
-    for x, particle in enumerate(particles):
+    for x, particle in enumerate(config.particles):
         if not particle.fixed:
-            for qarticle in particles:
+            for qarticle in config.particles:
                 if particle != qarticle:
 
                     dx, dy = mechanical.sub_vector(particle.P_xs, particle.P_ys, 
@@ -192,30 +188,27 @@ def update_particles(dt):
                     if r == 0:
                         r = 0.001
 
-                    if universals["G_const"].value:
-                        F = mechanical.law_force(universals["G_const"].value, r,
+                    if config.G_const.value:
+                        F = mechanical.law_force(config.G_const.value, r,
                                                  particle.m, qarticle.m)
                         particle.apply_force(F, θ)
 
-                    if universals["k_e_const"].value:
-                        F = mechanical.law_force(universals["k_e_const"].value, r,
+                    if config.k_e_const.value:
+                        F = mechanical.law_force(config.k_e_const.value, r,
                                                  particle.Q, qarticle.Q)
                         particle.apply_force(-F, θ)
 
-    for particle in particles[::-1]:
-        particle.update(dt, screen)
+    for particle in config.particles[::-1]:
+        particle.update(dt)
 
 
 def update_canvas():
-    global screen, screen_pixel, mouse_pixel   
-    global i_particles, particles
-    global preferences
 
-    vis_vectors, vis_values = preferences["vis_vectors"].value, preferences["vis_values"].value
+    vis_vectors, vis_values = config.vis_vectors.value, config.vis_values.value
 
-    visual.blank(screen)
+    visual.blank()
 
-    for i_particle in i_particles:
+    for i_particle in config.i_particles:
         if not i_particle.fixed:
 
             i_particle.draw_vector(dt=1, mouse=True)
@@ -229,7 +222,7 @@ def update_canvas():
             i_particle.label_values(screen, vis_values)
 
 
-    for particle in particles:
+    for particle in config.particles:
 
         if not particle.fixed:
 
@@ -248,17 +241,17 @@ def update_canvas():
         visual.mouse_pos(mouse_scale, mouse_pixel, screen_scale)
 
 
-    height = 20 * len(modifiers)
-    for i, modifier in enumerate(modifiers.values()):
-        marked = i == val_mode
-        modifier.display(screen_pixel[0], screen_pixel[1]-height, marked=marked)
+    height = 20 * (len(config.mod_group)-1)
+    for i, modifier in enumerate(config.mod_group.values()):
+        marked = i == config.mod_mode.value
+        modifier.display(config.screen_pixel[0], config.screen_pixel[1]-height, marked=marked)
         height -= 20
 
     visual.resolution()
     visual.time()
     visual.particle_count()
 
-    if not playing:
+    if not config.playing:
         visual.pause()
 
 
@@ -266,11 +259,11 @@ done = False
 while not done: #PROGRAM LOOP
     check_inputs()
 
-    if playing:
-        update_particles(universals["time_rate"].value / tick)
-        t += universals["time_rate"].value / tick
+    if config.playing:
+        update_particles(config.time_rate.value / config.tick)
+        config.t += config.time_rate.value / config.tick
 
     update_canvas()
 
-    clock.tick(tick)
+    config.clock.tick(config.tick)
     pygame.display.flip()

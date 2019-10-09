@@ -1,7 +1,5 @@
 import os, sys, math, time, copy, pygame, random, colorsys
 
-import config
-
 import visual_functions as visual
 
 class Modifier:
@@ -9,26 +7,26 @@ class Modifier:
     def __init__(self, value, visual):
         self.value = self.default = value[0]
         self.scaling = {"type":     value[1],
-                        "amount":   value[2:4],
-                        "bounds":   value[5:6]}
+                        "amount":   value[2],
+                        "bounds":   value[3]}
         self.name, self.unit, self.dp = visual
 
     def bump(self, bump_type, bump_magnitude):
         amount = self.scaling["amount"][bump_magnitude]
         identity = (1,-1)[bump_type == "dec"]
-        modulo = self.scaling["bounds"][1] - self.scaling["bounds"][0] + 1
 
-        if math_type == "lin":
+        if self.scaling["type"] == "lin":
             self.value += amount * identity
-        elif math_type == "geo":
-            self.value *= amount ** identity
-        elif math_type == "mod":
+        elif self.scaling["type"] == "geo":
+            self.value *= (1+amount) ** identity
+        elif self.scaling["type"] == "mod":
+            modulo = self.scaling["bounds"][1] - self.scaling["bounds"][0] + 1
             self.value = (self.value + amount * identity) % modulo
 
         if self.scaling["bounds"][0] != None:
-            self.value = min(self.scaling["bounds"][0], self.value)
+            self.value = max(self.scaling["bounds"][0], self.value)
         elif self.scaling["bounds"][1] != None:
-            self.value = max(self.scaling["bounds"][1], self.value)
+            self.value = min(self.scaling["bounds"][1], self.value)
 
     def display(self, P_xp, P_yp, marked=False):
         marker = ("", ">> ")[marked]
