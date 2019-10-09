@@ -5,9 +5,6 @@ import math_functions as mechanical
 
 
 pygame.display.set_caption("Simulation")
-screen_pixel = (1600, 900)
-screen = pygame.display.set_mode(screen_pixel, pygame.RESIZABLE)
-fullscreen = False
 
 clock = pygame.time.Clock()
 tick = 120
@@ -23,7 +20,7 @@ field_r   = Modifier((0,   "lin", (0.01, 0.1, 1),  (None, None)), ("Field streng
 field_θ   = Modifier((270, "mod", (1,    5,   30), (0,    359)),  ("Field angle",    "degrees", 0))
 G_const   = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("G",              "Nm2kg-2", 2))
 k_e_const = Modifier((1,   "lin", (0.01, 0.1, 1),  (0,    None)), ("k_e",            "Nm2C-2",  2))
-life      = Modifier((0,   "lin", (0.1,  1,   10), (0,    None)), ("particle life",  "m",       1))
+life      = Modifier((0,   "lin", (0.1,  1,   10), (0,    None)), ("Particle life",  "m",       1))
 universals = {"time_rate": time_rate, "field_r": field_r, "field_θ": field_θ,
             "G_const": G_const, "k_e_const": k_e_const, "life": life}
 
@@ -44,7 +41,10 @@ mod_group = mod_groups[mod_menu.value]
 mod_mode = Modifier((0, "mod", (1, 1, 1), [0, len(mod_group)-1]), ("", "", 0))
 #endregion
 
+screen_pixel = (1600, 900)
 screen_scale = mechanical.to_scale(*screen_pixel)
+screen = pygame.display.set_mode(screen_pixel, pygame.RESIZABLE)
+fullscreen = False
 
 mouse_pixel = pygame.mouse.get_pos()
 mouse_scale = mechanical.to_scale(*mouse_pixel, point=True)

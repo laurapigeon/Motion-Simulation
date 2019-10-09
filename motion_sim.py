@@ -7,6 +7,8 @@ from Modifier_class import Modifier
 import math_functions as mechanical
 import visual_functions as visual
 
+pygame.init()
+
 #endregion
 
 
@@ -167,8 +169,8 @@ def check_inputs():
 
 
         if event.type == pygame.MOUSEMOTION:
-            config.mouse_pixel = pygame.mouse.get_pos()
-            config.screen_scale = mechanical.to_scale(*config.mouse_pixel, point=True)
+            config.mouse_pixel = event.pos
+            config.mouse_scale = mechanical.to_scale(*config.mouse_pixel, point=True)
 
 
 def update_particles(dt):
