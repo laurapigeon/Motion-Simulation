@@ -34,8 +34,8 @@ def mouse_pos(mouse_scale, mouse_pixel, screen_scale):
 def pause():
     for i in range(2):
         pygame.draw.line(config.screen, (164, 164, 255),
-                         (10*(i+1), config.screen_pixel[1] - 30),
-                         (10*(i+1), config.screen_pixel[1] - 10), 5)
+                         (10 * (i+1), config.screen_pixel[1] - 30),
+                         (10 * (i+1), config.screen_pixel[1] - 10), 5)
 
 def blank():
     config.screen.fill((0, 0, 0))
